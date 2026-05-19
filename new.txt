@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>MediBook Appointment System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    color:#222;
+}
+
+header{
+    background:#1a3a5c;
+    color:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+header h2{
+    font-size:28px;
+}
+
+nav button{
+    padding:8px 15px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-left:5px;
+    transition:0.3s;
+}
+
+nav button:hover{
+    background:#ddd;
+}
+
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:20px auto;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
+
+label{
+    font-weight:bold;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+textarea{
+    resize:none;
+}
+
+.btn{
+    padding:10px 18px;
+    border:none;
+    border-radius:5px;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.primary{
+    background:#1a3a5c;
+}
+
+.primary:hover{
+    background:#274d75;
+    transform:translateY(-2px);
+}
+
+.danger{
+    background:#d9534f;
+}
+
+.danger:hover{
+    background:#b52b27;
+    transform:translateY(-2px);
+}
+
+.slot{
+    padding:10px 15px;
+    margin:5px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.available{
+    background:#28a745;
+    color:white;
+}
+
+.available:hover{
+    background:#1f7f35;
+    transform:scale(1.05);
+}
+
+.booked{
+    background:#ccc;
+    cursor:not-allowed;
+}
+
+.selected{
+    background:#1a3a5c;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#1a3a5c;
+    color:white;
+}
+
+#message{
+    padding:10px;
+    border-radius:5px;
+    margin-bottom:15px;
+    display:none;
+    animation:slide 0.5s;
+}
+
+@keyframes slide{
+
+    from{
+        opacity:0;
+        transform:translateY(-10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.dark{
+    background:#121212;
+    color:white;
+}
+
+.dark .card{
+    background:#1e1e1e;
+}
+
+.dark input,
+.dark select,
+.dark textarea{
+    background:#2c2c2c;
+    color:white;
+    border:1px solid #555;
+}
+
+#modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.progress-container{
+    background:#ddd;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+#progressBar{
+    height:20px;
+    width:0%;
+    background:#28a745;
+    color:white;
+    text-align:center;
+}
+
+@media(max-width:700px){
+
+    header{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    table{
+        font-size:12px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h2>🏥 MediBook</h2>
+
+<nav>
+
+<button onclick="showSection('book')">
+Book
+</button>
+
+<button onclick="showSection('history')">
+History
+</button>
+
+<button onclick="toggleTheme()">
+🌙 Theme
+</button>
+
+</nav>
+
+</header>
+
+<div class="container">
+
+<div id="message"></div>
+
+<!-- BOOK SECTION -->
+
+<div id="bookSection" class="card">
+
+<h2>Book Appointment</h2>
+
+<br>
+
+<div class="progress-container">
+<div id="progressBar">0%</div>
+</div>
+
+<br>
+
+<div class="grid">
+
+<div>
+
+<label>Patient Name</label>
+
+<input type="text"
+id="name"
+onkeyup="updateProgress()">
+
+</div>
+
+<div>
+
+<label>Age</label>
+
+<input type="number"
+id="age"
+onkeyup="updateProgress()">
+
+</div>
+
+<div>
+
+<label>Gender</label>
+
+<select id="gender"
+onchange="updateProgress()">
+
+<option value="">Select</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>Contact Number</label>
+
+<input type="text"
+id="contact"
+onkeyup="updateProgress()">
+
+</div>
+
+<div>
+
+<label>Email</label>
+
+<input type="email"
+id="email"
+onkeyup="updateProgress()">
+
+</div>
+
+<div>
+
+<label>Department</label>
+
+<select id="department"
+onchange="loadDoctors();updateProgress()">
+
+<option value="">Select</option>
+
+<option>General Medicine</option>
+<option>Pediatrics</option>
+<option>Orthopedics</option>
+<option>Dermatology</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>Doctor</label>
+
+<select id="doctor"
+onchange="loadSlots();updateProgress()">
+
+<option value="">Select</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label>Appointment Date</label>
+
+<input type="date"
+id="date"
+onchange="loadSlots();updateProgress()">
+
+</div>
+
+</div>
+
+<br>
+
+<label>Reason For Visit</label>
+
+<textarea id="reason"></textarea>
+
+<br><br>
+
+<h3>Available Slots</h3>
+
+<div id="slots"></div>
+
+<br>
+
+<h3>Appointment Summary</h3>
+
+<div id="summary"></div>
+
+<br>
+
+<button class="btn primary"
+onclick="bookAppointment()">
+
+Confirm Booking
+
+</button>
+
+<button class="btn primary"
+onclick="downloadReceipt()">
+
+Download Receipt
+
+</button>
+
+<button class="btn danger"
+onclick="resetForm()">
+
+Reset
+
+</button>
+
+</div>
+
+<!-- HISTORY SECTION -->
+
+<div id="historySection"
+class="card"
+style="display:none;">
+
+<h2>Appointment History</h2>
+
+<br>
+
+<input type="text"
+id="search"
+placeholder="Search by patient name"
+onkeyup="renderAppointments()">
+
+<br><br>
+
+<select id="filterDept"
+onchange="renderAppointments()">
+
+<option value="">All Departments</option>
+
+<option>General Medicine</option>
+<option>Pediatrics</option>
+<option>Orthopedics</option>
+<option>Dermatology</option>
+
+</select>
+
+<select id="filterDoctor"
+onchange="renderAppointments()">
+
+<option value="">All Doctors</option>
+
+</select>
+
+<input type="date"
+id="filterDate"
+onchange="renderAppointments()">
+
+<select id="sortOption"
+onchange="renderAppointments()">
+
+<option value="">Sort By</option>
+
+<option value="name">
+Patient Name
+</option>
+
+<option value="date">
+Appointment Date
+</option>
+
+</select>
+
+<br><br>
+
+<div id="departmentCount"></div>
+
+<br>
+
+<div id="nextAppointment"></div>
+
+<br>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Doctor</th>
+<th>Department</th>
+<th>Date</th>
+<th>Slot</th>
+<th>Status</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- MODAL -->
+
+<div id="modal">
+
+<div class="modal-box">
+
+<h2 id="modalText"></h2>
+
+<br>
+
+<button class="btn primary"
+onclick="closeModal()">
+
+OK
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const doctors = {
+
+"General Medicine":[
+"Dr. Priya",
+"Dr. Rajesh"
+],
+
+"Pediatrics":[
+"Dr. Meena",
+"Dr. Suresh"
+],
+
+"Orthopedics":[
+"Dr. Arvind",
+"Dr. Kavitha"
+],
+
+"Dermatology":[
+"Dr. Deepa",
+"Dr. Farhan"
+]
+
+};
+
+const allSlots = [
+
+"09:00 AM",
+"09:30 AM",
+"10:00 AM",
+"10:30 AM",
+"11:00 AM",
+"11:30 AM",
+"02:00 PM",
+"02:30 PM"
+
+];
+
+let appointments =
+JSON.parse(localStorage.getItem("appointments"))
+|| [];
+
+let selectedSlot = "";
+
+let editId = null;
+
+function get(id){
+    return document.getElementById(id);
+}
+
+function showMessage(text,color){
+
+    let msg = get("message");
+
+    msg.style.display = "block";
+    msg.style.background = color;
+    msg.style.color = "white";
+
+    msg.innerHTML = text;
+
+    setTimeout(()=>{
+
+        msg.style.display = "none";
+
+    },3000);
+}
+
+function showSection(section){
+
+    get("bookSection").style.display =
+    "none";
+
+    get("historySection").style.display =
+    "none";
+
+    if(section=="book"){
+
+        get("bookSection").style.display =
+        "block";
+    }
+
+    else{
+
+        get("historySection").style.display =
+        "block";
+
+        renderAppointments();
+    }
+}
+
+function toggleTheme(){
+
+    document.body.classList.toggle("dark");
+}
+
+function loadDoctors(){
+
+    let dept = get("department").value;
+
+    let doctor = get("doctor");
+
+    doctor.innerHTML =
+    '<option value="">Select</option>';
+
+    if(doctors[dept]){
+
+        doctors[dept].forEach(d=>{
+
+            doctor.innerHTML +=
+            `<option>${d}</option>`;
+
+        });
+    }
+}
+
+function loadSlots(){
+
+    let doctor = get("doctor").value;
+
+    let date = get("date").value;
+
+    let slotsDiv = get("slots");
+
+    slotsDiv.innerHTML = "";
+
+    if(!doctor || !date) return;
+
+    let bookedSlots =
+    appointments
+    .filter(a=>
+
+        a.doctor==doctor &&
+        a.date==date &&
+        a.status=="Booked"
+
+    )
+    .map(a=>a.slot);
+
+    allSlots.forEach(slot=>{
+
+        let btn =
+        document.createElement("button");
+
+        btn.innerHTML = slot;
+
+        btn.className =
+
+        bookedSlots.includes(slot)
+
+        ?
+
+        "slot booked"
+
+        :
+
+        "slot available";
+
+        if(bookedSlots.includes(slot)){
+
+            btn.disabled = true;
+        }
+
+        btn.onclick = ()=>selectSlot(slot);
+
+        slotsDiv.appendChild(btn);
+    });
+}
+
+function selectSlot(slot){
+
+    selectedSlot = slot;
+
+    document
+    .querySelectorAll(".slot")
+    .forEach(btn=>
+
+        btn.classList.remove("selected")
+
+    );
+
+    [...document.querySelectorAll(".slot")]
+    .find(btn=>btn.innerHTML==slot)
+    .classList.add("selected");
+
+    showSummary();
+
+    showMessage(
+    "Slot Available",
+    "green"
+    );
+}
+
+function showSummary(){
+
+    let waitingTime =
+    (allSlots.indexOf(selectedSlot)+1)
+    * 15;
+
+    get("summary").innerHTML = `
+
+    <p><b>Name:</b>
+    ${get("name").value}</p>
+
+    <p><b>Doctor:</b>
+    ${get("doctor").value}</p>
+
+    <p><b>Date:</b>
+    ${get("date").value}</p>
+
+    <p><b>Slot:</b>
+    ${selectedSlot}</p>
+
+    <p><b>Estimated Waiting Time:</b>
+    ${waitingTime} Minutes</p>
+
+    `;
+}
+
+function validate(){
+
+    if(get("name").value==""){
+
+        showMessage(
+        "Enter Patient Name",
+        "red"
+        );
+
+        return false;
+    }
+
+    if(get("age").value<1 ||
+       get("age").value>120){
+
+        showMessage(
+        "Invalid Age",
+        "red"
+        );
+
+        return false;
+    }
+
+    if(!/^\d{10}$/.test(
+       get("contact").value)){
+
+        showMessage(
+        "Invalid Contact Number",
+        "red"
+        );
+
+        return false;
+    }
+
+    if(get("email").value==""){
+
+        showMessage(
+        "Enter Email",
+        "red"
+        );
+
+        return false;
+    }
+
+    if(get("date").value <
+       new Date().toISOString().split("T")[0]){
+
+        showMessage(
+        "Date Cannot Be In Past",
+        "red"
+        );
+
+        return false;
+    }
+
+    if(selectedSlot==""){
+
+        showMessage(
+        "Select Slot",
+        "red"
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+function bookAppointment(){
+
+    if(!validate()) return;
+
+    let appointment = {
+
+        id:
+        editId ||
+        "MB"+Date.now(),
+
+        token:
+        Math.floor(Math.random()*100),
+
+        name:get("name").value,
+
+        age:get("age").value,
+
+        gender:get("gender").value,
+
+        contact:get("contact").value,
+
+        email:get("email").value,
+
+        department:get("department").value,
+
+        doctor:get("doctor").value,
+
+        date:get("date").value,
+
+        slot:selectedSlot,
+
+        reason:get("reason").value,
+
+        status:"Booked"
+    };
+
+    if(editId){
+
+        let index =
+        appointments.findIndex(
+        a=>a.id==editId
+        );
+
+        appointments[index] =
+        appointment;
+
+        editId = null;
+
+        showMessage(
+        "Appointment Updated Successfully",
+        "green"
+        );
+    }
+
+    else{
+
+        appointments.push(appointment);
+
+        showMessage(
+        "Appointment Booked Successfully",
+        "green"
+        );
+    }
+
+    localStorage.setItem(
+
+    "appointments",
+
+    JSON.stringify(appointments)
+
+    );
+
+    renderAppointments();
+
+    openModal(
+
+    `Booking Confirmed <br><br>
+
+    Booking ID:
+    ${appointment.id}
+
+    <br><br>
+
+    Token Number:
+    ${appointment.token}`
+
+    );
+
+    resetForm();
+}
+
+function renderAppointments(){
+
+    let search =
+    get("search").value.toLowerCase();
+
+    let deptFilter =
+    get("filterDept").value;
+
+    let doctorFilter =
+    get("filterDoctor").value;
+
+    let dateFilter =
+    get("filterDate").value;
+
+    let sortOption =
+    get("sortOption").value;
+
+    let data =
+    appointments.filter(a=>{
+
+    return (
+
+        a.name.toLowerCase()
+        .includes(search)
+
+        &&
+
+        (deptFilter==""
+        ||
+
+        a.department==deptFilter)
+
+        &&
+
+        (doctorFilter==""
+        ||
+
+        a.doctor==doctorFilter)
+
+        &&
+
+        (dateFilter==""
+        ||
+
+        a.date==dateFilter)
+
+    );
+
+});
+
+if(sortOption=="name"){
+
+    data.sort((a,b)=>
+
+    a.name.localeCompare(b.name)
+
+    );
+}
+
+if(sortOption=="date"){
+
+    data.sort((a,b)=>
+
+    new Date(a.date)
+    -
+    new Date(b.date)
+
+    );
+}
+
+let counts = {};
+
+appointments.forEach(a=>{
+
+    if(a.status=="Booked"){
+
+        counts[a.department] =
+
+        (counts[a.department] || 0)+1;
+    }
+});
+
+get("departmentCount").innerHTML =
+
+Object.entries(counts)
+.map(c=>
+
+`<p><b>${c[0]}</b> :
+${c[1]} Appointments</p>`
+
+).join("");
+
+let upcoming =
+
+appointments
+
+.filter(a=>
+
+a.status=="Booked"
+
+&&
+
+new Date(a.date)>=new Date()
+
+)
+
+.sort((a,b)=>
+
+new Date(a.date)
+-
+new Date(b.date)
+
+)[0];
+
+if(upcoming){
+
+    get("nextAppointment").innerHTML =
+
+    `<h3>
+
+    Next Appointment:
+
+    ${upcoming.name}
+
+    -
+
+    ${upcoming.date}
+
+    -
+
+    ${upcoming.slot}
+
+    </h3>`;
+}
+
+else{
+
+    get("nextAppointment").innerHTML =
+
+    "<h3>No Upcoming Appointments</h3>";
+}
+
+let body =
+get("tableBody");
+
+if(data.length==0){
+
+    body.innerHTML =
+
+    `<tr>
+
+    <td colspan="8">
+
+    No Appointments
+
+    </td>
+
+    </tr>`;
+
+    return;
+}
+
+body.innerHTML =
+
+data.map(a=>`
+
+<tr>
+
+<td>${a.id}</td>
+
+<td>${a.name}</td>
+
+<td>${a.doctor}</td>
+
+<td>${a.department}</td>
+
+<td>${a.date}</td>
+
+<td>${a.slot}</td>
+
+<td>${a.status}</td>
+
+<td>
+
+${
+
+a.status=="Booked"
+
+?
+
+`
+
+<button
+class="btn primary"
+onclick="editAppointment('${a.id}')">
+
+Edit
+
+</button>
+
+<button
+class="btn danger"
+onclick="cancelAppointment('${a.id}')">
+
+Cancel
+
+</button>
+
+`
+
+:
+
+"Cancelled"
+
+}
+
+</td>
+
+</tr>
+
+`).join("");
+}
+
+function editAppointment(id){
+
+    let a =
+    appointments.find(x=>x.id==id);
+
+    editId = id;
+
+    showSection("book");
+
+    get("name").value = a.name;
+    get("age").value = a.age;
+    get("gender").value = a.gender;
+    get("contact").value = a.contact;
+    get("email").value = a.email;
+    get("department").value = a.department;
+
+    loadDoctors();
+
+    get("doctor").value = a.doctor;
+
+    get("date").value = a.date;
+
+    get("reason").value = a.reason;
+
+    loadSlots();
+
+    selectedSlot = a.slot;
+
+    showSummary();
+}
+
+function cancelAppointment(id){
+
+    let confirmCancel =
+    confirm("Cancel Appointment?");
+
+    if(!confirmCancel) return;
+
+    let a =
+    appointments.find(x=>x.id==id);
+
+    a.status = "Cancelled";
+
+    localStorage.setItem(
+
+    "appointments",
+
+    JSON.stringify(appointments)
+
+    );
+
+    renderAppointments();
+
+    showMessage(
+
+    "Appointment Cancelled Successfully",
+
+    "orange"
+
+    );
+}
+
+function resetForm(){
+
+    [
+
+    "name",
+    "age",
+    "contact",
+    "email",
+    "reason",
+    "date"
+
+    ].forEach(id=>
+
+        get(id).value=""
+
+    );
+
+    [
+
+    "gender",
+    "department",
+    "doctor"
+
+    ].forEach(id=>
+
+        get(id).value=""
+
+    );
+
+    get("slots").innerHTML = "";
+
+    get("summary").innerHTML = "";
+
+    selectedSlot = "";
+
+    updateProgress();
+}
+
+function openModal(text){
+
+    get("modal").style.display =
+    "flex";
+
+    get("modalText").innerHTML =
+    text;
+}
+
+function closeModal(){
+
+    get("modal").style.display =
+    "none";
+}
+
+function updateProgress(){
+
+    let total = 8;
+
+    let filled = 0;
+
+    [
+
+    "name",
+    "age",
+    "gender",
+    "contact",
+    "email",
+    "department",
+    "doctor",
+    "date"
+
+    ].forEach(id=>{
+
+        if(get(id).value!=""){
+
+            filled++;
+        }
+    });
+
+    let percent =
+
+    Math.floor((filled/total)*100);
+
+    get("progressBar").style.width =
+    percent+"%";
+
+    get("progressBar").innerHTML =
+    percent+"%";
+}
+
+function downloadReceipt(){
+
+    if(selectedSlot==""){
+
+        showMessage(
+        "Book Appointment First",
+        "red"
+        );
+
+        return;
+    }
+
+    let receipt =
+    window.open("","_blank");
+
+    receipt.document.write(`
+
+    <html>
+
+    <head>
+
+    <title>
+    Appointment Receipt
+    </title>
+
+    <style>
+
+    body{
+        font-family:Arial;
+        padding:20px;
+    }
+
+    h2{
+        color:#1a3a5c;
+    }
+
+    p{
+        font-size:18px;
+    }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h2>
+    MediBook Appointment Receipt
+    </h2>
+
+    <hr>
+
+    <p><b>Name:</b>
+    ${get("name").value}</p>
+
+    <p><b>Doctor:</b>
+    ${get("doctor").value}</p>
+
+    <p><b>Department:</b>
+    ${get("department").value}</p>
+
+    <p><b>Date:</b>
+    ${get("date").value}</p>
+
+    <p><b>Slot:</b>
+    ${selectedSlot}</p>
+
+    <p><b>Reason:</b>
+    ${get("reason").value}</p>
+
+    </body>
+
+    </html>
+
+    `);
+
+    receipt.document.close();
+
+    receipt.print();
+}
+
+function loadFilterDoctors(){
+
+    let select = get("filterDoctor");
+
+    select.innerHTML =
+
+    '<option value="">All Doctors</option>';
+
+    Object.values(doctors)
+    .flat()
+    .forEach(d=>{
+
+        select.innerHTML +=
+        `<option>${d}</option>`;
+
+    });
+}
+
+loadFilterDoctors();
+
+renderAppointments();
+
+</script>
+
+</body>
+</html>
