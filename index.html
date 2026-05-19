@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MediBook</title>
+<style>
+
+body {
+  font-family: Arial;
+  background: #f8fafc;
+  margin: 0;
+}
+
+header {
+  background: #0f172a;
+  color: white;
+  padding: 18px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.container {
+  width: 85%;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.full-width {
+  grid-column: 1/3;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+label { font-weight: bold; }
+
+.sub {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #1e3a8a;
+  color: white;
+}
+
+.summary {
+  background: #eff6ff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: none;
+}
+
+#search {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  width: 300px;
+  margin-bottom: 10px;
+}
+
+button.cancel-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🏥 MediBook</div>
+  <nav>
+    <a onclick="showPage('bookingPage')">Book Appointment</a>
+    <a onclick="showPage('doctorPage')">Doctors</a>
+    <a onclick="showPage('appointmentsPage')">My Appointments</a>
+  </nav>
+</header>
+
+
+<!-- BOOKING PAGE -->
+<div id="bookingPage" class="container">
+
+  <h2>Book Appointment</h2>
+
+  <form id="appointmentForm" novalidate>
+
+    <div>
+      <label>Full Name</label>
+      <input id="patientName" placeholder="Enter full name">
+      <div class="error" id="nameErr">Please enter your name.</div>
+    </div>
+
+    <div>
+      <label>Age</label>
+      <input type="number" id="patientAge" placeholder="Enter age" min="1" max="120">
+      <div class="error" id="ageErr">Please enter a valid age (1–120).</div>
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input type="email" id="patientEmail" placeholder="Enter email">
+      <div class="error" id="emailErr">Please enter a valid email.</div>
+    </div>
+
+    <div>
+      <label>Phone</label>
+      <input type="tel" id="patientPhone" placeholder="Enter 10-digit phone number">
+      <div class="error" id="phoneErr">Please enter a valid 10-digit phone number.</div>
+    </div>
+
+    <div>
+      <label>Department</label>
+      <select id="department">
+        <option value="">Select Department</option>
+        <option>General Medicine</option>
+        <option>Pediatrics</option>
+        <option>Orthopedics</option>
+        <option>Dermatology</option>
+      </select>
+      <div class="error" id="deptErr">Please select a department.</div>
+    </div>
+
+    <div>
+      <label>Doctor</label>
+      <select id="doctor">
+        <option value="">Select Doctor</option>
+      </select>
+      <div class="error" id="doctorErr">Please select a doctor.</div>
+    </div>
+
+    <div>
+      <label>Date</label>
+      <input type="date" id="appointmentDate">
+      <div class="error" id="dateErr">Please select a valid future date.</div>
+    </div>
+
+    <div>
+      <label>Slot</label>
+      <select id="slots">
+        <option value="">Select Slot</option>
+      </select>
+      <div class="error" id="slotErr">Please select a slot.</div>
+    </div>
+
+    <div class="full-width">
+      <input type="submit" value="Book Appointment" class="sub">
+    </div>
+
+  </form>
+
+  <div id="summaryBox" style="display:none">
+    <h3>✅ Appointment Confirmed</h3>
+    <div class="summary" id="summaryContent"></div>
+  </div>
+
+</div>
+
+
+<!-- DOCTORS PAGE -->
+<div id="doctorPage" class="container" style="display:none">
+  <h2>Doctors Available</h2>
+  <table>
+    <tr><th>Department</th><th>Doctors</th></tr>
+    <tr><td>General Medicine</td><td>Dr. Rajiv Sharma, Dr. Suman Mehta</td></tr>
+    <tr><td>Pediatrics</td><td>Dr. Priya Reddy, Dr. Samba Shivarao</td></tr>
+    <tr><td>Orthopedics</td><td>Dr. Ravi Kumar, Dr. Gabbar Singh</td></tr>
+    <tr><td>Dermatology</td><td>Dr. Aman Patel, Dr. Nisha Pati</td></tr>
+  </table>
+</div>
+
+
+<!-- APPOINTMENTS PAGE -->
+<div id="appointmentsPage" class="container" style="display:none">
+  <h2>My Appointments</h2>
+  <input id="search" placeholder="🔍 Search by patient name">
+  <table id="appointmentTable"></table>
+</div>
+
+
+<script>
+
+/* ---------- PAGE SWITCH ---------- */
+function showPage(id) {
+  document.querySelectorAll(".container").forEach(p => p.style.display = "none");
+  document.getElementById(id).style.display = "block";
+  if (id === "appointmentsPage") displayAppointments();
+}
+
+/* ---------- DATA ---------- */
+const doctors = {
+  "General Medicine": ["Dr. Rajiv Sharma", "Dr. Suman Mehta"],
+  "Pediatrics":       ["Dr. Priya Reddy", "Dr. Samba Shivarao"],
+  "Orthopedics":      ["Dr. Ravi Kumar", "Dr. Gabbar Singh"],
+  "Dermatology":      ["Dr. Aman Patel", "Dr. Nisha Pati"]
+};
+
+const allSlots = ["9:00 AM", "10:00 AM", "12:00 PM", "3:00 PM", "4:00 PM"];
+
+// Use a key that won't collide with window.name etc.
+let appointments = JSON.parse(localStorage.getItem("medibook_appointments")) || [];
+
+/* ---------- ELEMENT REFS ---------- */
+// NOTE: Never use variable names like 'name' or 'date' — they shadow browser globals.
+const form           = document.getElementById("appointmentForm");
+const deptSelect     = document.getElementById("department");
+const doctorSelect   = document.getElementById("doctor");
+const slotsSelect    = document.getElementById("slots");
+const dateInput      = document.getElementById("appointmentDate");
+const nameInput      = document.getElementById("patientName");
+const ageInput       = document.getElementById("patientAge");
+const emailInput     = document.getElementById("patientEmail");
+const phoneInput     = document.getElementById("patientPhone");
+const searchInput    = document.getElementById("search");
+const apptTable      = document.getElementById("appointmentTable");
+const summaryBox     = document.getElementById("summaryBox");
+const summaryContent = document.getElementById("summaryContent");
+
+/* ---------- SET MIN DATE TO TODAY ---------- */
+function setMinDate() {
+  const today = new Date().toISOString().split("T")[0];
+  dateInput.setAttribute("min", today);
+}
+setMinDate();
+
+/* ---------- LOAD DOCTORS ---------- */
+function loadDoctors() {
+  doctorSelect.innerHTML = "<option value=''>Select Doctor</option>";
+  slotsSelect.innerHTML  = "<option value=''>Select Slot</option>";
+  const list = doctors[deptSelect.value];
+  if (!list) return;
+  list.forEach(doc => {
+    const opt = document.createElement("option");
+    opt.value = doc;
+    opt.textContent = doc;
+    doctorSelect.appendChild(opt);
+  });
+}
+
+/* ---------- LOAD SLOTS ---------- */
+function loadSlots() {
+  slotsSelect.innerHTML = "<option value=''>Select Slot</option>";
+  if (!doctorSelect.value || !dateInput.value) return;
+
+  allSlots.forEach(slot => {
+    const opt = document.createElement("option");
+    opt.value = slot;
+    opt.textContent = slot;
+
+    const booked = appointments.some(a =>
+      a.doctor === doctorSelect.value &&
+      a.date   === dateInput.value &&
+      a.slot   === slot &&
+      a.status === "Booked"
+    );
+
+    if (booked) {
+      opt.disabled = true;
+      opt.textContent += " (Booked)";
+    }
+    slotsSelect.appendChild(opt);
+  });
+}
+
+/* ---------- SHOW / HIDE ERROR ---------- */
+function showErr(id, show) {
+  document.getElementById(id).style.display = show ? "block" : "none";
+}
+
+/* ---------- VALIDATE ---------- */
+function validate() {
+  let valid = true;
+
+  // Name
+  if (!nameInput.value.trim()) {
+    showErr("nameErr", true); valid = false;
+  } else { showErr("nameErr", false); }
+
+  // Age
+  const age = parseInt(ageInput.value);
+  if (!ageInput.value || isNaN(age) || age < 1 || age > 120) {
+    showErr("ageErr", true); valid = false;
+  } else { showErr("ageErr", false); }
+
+  // Email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+    showErr("emailErr", true); valid = false;
+  } else { showErr("emailErr", false); }
+
+  // Phone
+  const phoneRegex = /^\d{10}$/;
+  if (!phoneInput.value.trim() || !phoneRegex.test(phoneInput.value.trim())) {
+    showErr("phoneErr", true); valid = false;
+  } else { showErr("phoneErr", false); }
+
+  // Department
+  if (!deptSelect.value) {
+    showErr("deptErr", true); valid = false;
+  } else { showErr("deptErr", false); }
+
+  // Doctor
+  if (!doctorSelect.value) {
+    showErr("doctorErr", true); valid = false;
+  } else { showErr("doctorErr", false); }
+
+  // Date — must be selected and not in the past
+  const today = new Date().toISOString().split("T")[0];
+  if (!dateInput.value || dateInput.value < today) {
+    showErr("dateErr", true); valid = false;
+  } else { showErr("dateErr", false); }
+
+  // Slot
+  if (!slotsSelect.value) {
+    showErr("slotErr", true); valid = false;
+  } else { showErr("slotErr", false); }
+
+  return valid;
+}
+
+/* ---------- BOOK ---------- */
+form.addEventListener("submit", e => {
+  e.preventDefault();
+
+  if (!validate()) return;
+
+  const app = {
+    bookingID:  "BK" + Date.now(),
+    name:       nameInput.value.trim(),
+    age:        ageInput.value.trim(),
+    email:      emailInput.value.trim(),
+    phone:      phoneInput.value.trim(),
+    department: deptSelect.value,
+    doctor:     doctorSelect.value,
+    date:       dateInput.value,
+    slot:       slotsSelect.value,
+    status:     "Booked"
+  };
+
+  appointments.push(app);
+  localStorage.setItem("medibook_appointments", JSON.stringify(appointments));
+
+  showSummary(app);
+  form.reset();
+  doctorSelect.innerHTML = "<option value=''>Select Doctor</option>";
+  slotsSelect.innerHTML  = "<option value=''>Select Slot</option>";
+});
+
+/* ---------- SUMMARY ---------- */
+function showSummary(app) {
+  summaryBox.style.display = "block";
+  summaryContent.innerHTML = `
+    <p><b>Booking ID:</b> ${app.bookingID}</p>
+    <p><b>Name:</b> ${app.name}</p>
+    <p><b>Age:</b> ${app.age}</p>
+    <p><b>Email:</b> ${app.email}</p>
+    <p><b>Phone:</b> ${app.phone}</p>
+    <p><b>Department:</b> ${app.department}</p>
+    <p><b>Doctor:</b> ${app.doctor}</p>
+    <p><b>Date:</b> ${app.date}</p>
+    <p><b>Slot:</b> ${app.slot}</p>
+    <p><b>Status:</b> ✅ ${app.status}</p>
+  `;
+  summaryBox.scrollIntoView({ behavior: "smooth" });
+}
+
+/* ---------- TABLE ---------- */
+function displayAppointments(data = appointments) {
+  apptTable.innerHTML = `
+    <tr>
+      <th>ID</th><th>Name</th><th>Email</th>
+      <th>Doctor</th><th>Date</th><th>Slot</th>
+      <th>Status</th><th>Action</th>
+    </tr>
+  `;
+
+  if (data.length === 0) {
+    apptTable.innerHTML += `<tr><td colspan="8">No appointments found.</td></tr>`;
+    return;
+  }
+
+  data.forEach((app, i) => {
+    // Find real index in appointments array when filtering
+    const realIndex = appointments.indexOf(app);
+    const row = apptTable.insertRow();
+    row.innerHTML = `
+      <td>${app.bookingID}</td>
+      <td>${app.name}</td>
+      <td>${app.email}</td>
+      <td>${app.doctor}</td>
+      <td>${app.date}</td>
+      <td>${app.slot}</td>
+      <td>${app.status}</td>
+      <td>
+        <button class="cancel-btn" onclick="cancelAppointment(${realIndex})">Cancel</button>
+      </td>
+    `;
+  });
+}
+
+/* ---------- CANCEL ---------- */
+function cancelAppointment(i) {
+  if (!confirm("Cancel this appointment?")) return;
+  appointments.splice(i, 1);
+  localStorage.setItem("medibook_appointments", JSON.stringify(appointments));
+  displayAppointments();
+}
+
+/* ---------- SEARCH ---------- */
+searchInput.addEventListener("keyup", () => {
+  const val = searchInput.value.toLowerCase();
+  displayAppointments(appointments.filter(a => a.name.toLowerCase().includes(val)));
+});
+
+/* ---------- EVENTS ---------- */
+deptSelect.addEventListener("change", loadDoctors);
+doctorSelect.addEventListener("change", loadSlots);
+dateInput.addEventListener("change", loadSlots);
+
+/* ---------- INIT ---------- */
+displayAppointments();
+
+</script>
+</body>
+</html>
