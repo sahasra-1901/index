@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MediBook</title>
+
+<style>
+
+/* ---------- BODY ---------- */
+body{
+font-family:Arial;
+background:#f8fafc;
+margin:0;
+transition:0.3s;
+}
+
+/* ---------- HEADER ---------- */
+header{
+background:#0f172a;
+color:white;
+padding:18px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:26px;
+font-weight:bold;
+}
+
+nav a{
+color:white;
+margin-left:20px;
+text-decoration:none;
+font-weight:bold;
+cursor:pointer;
+}
+
+#themeBtn{
+background:#1e3a8a;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* ---------- CONTAINER ---------- */
+.container{
+width:85%;
+margin:30px auto;
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+/* ---------- FORM ---------- */
+form{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.full-width{
+grid-column:1/3;
+}
+
+input,select{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #cbd5e1;
+margin-top:6px;
+box-sizing:border-box;
+}
+
+label{font-weight:bold;}
+
+.sub{
+background:#1e3a8a;
+color:white;
+border:none;
+padding:12px;
+border-radius:8px;
+cursor:pointer;
+width:100%;
+}
+
+/* ---------- TABLE ---------- */
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #cbd5e1;
+padding:12px;
+text-align:center;
+}
+
+th{
+background:#1e3a8a;
+color:white;
+}
+
+/* ---------- SUMMARY ---------- */
+.summary{
+background:#eff6ff;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+}
+
+/* ---------- ERROR ---------- */
+.error{
+color:red;
+font-size:13px;
+display:none;
+}
+
+/* ---------- SEARCH ---------- */
+#search{
+padding:10px;
+border-radius:8px;
+border:1px solid #cbd5e1;
+width:300px;
+margin-bottom:10px;
+}
+
+.cancel-btn{
+background:#dc2626;
+color:white;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* ---------- DARK MODE ---------- */
+.dark body{
+background:#020617;
+color:white;
+}
+
+.dark .container{
+background:#0f172a;
+color:white;
+}
+
+.dark input,.dark select{
+background:#1e293b;
+color:white;
+border:1px solid #475569;
+}
+
+.dark th{background:#334155;}
+.dark td{border-color:#475569;}
+
+.dark header{background:#020617;}
+
+.dark .summary{background:#1e293b;}
+
+.dark #search{
+background:#1e293b;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">🏥 MediBook</div>
+
+<nav>
+<a onclick="showPage('bookingPage')">Book Appointment</a>
+<a onclick="showPage('doctorPage')">Doctors</a>
+<a onclick="showPage('appointmentsPage')">My Appointments</a>
+</nav>
+
+<button id="themeBtn" onclick="toggleTheme()">🌙 Dark Mode</button>
+
+</header>
+
+<!-- BOOK PAGE -->
+<div id="bookingPage" class="container">
+
+<h2>Book Appointment</h2>
+
+<form id="appointmentForm">
+
+<div>
+<label>Name</label>
+<input id="patientName">
+<div class="error" id="nameErr">Enter name</div>
+</div>
+
+<div>
+<label>Age</label>
+<input type="number" id="patientAge">
+<div class="error" id="ageErr">Invalid age</div>
+</div>
+
+<div>
+<label>Email</label>
+<input id="patientEmail">
+<div class="error" id="emailErr">Invalid email</div>
+</div>
+
+<div>
+<label>Phone</label>
+<input id="patientPhone">
+<div class="error" id="phoneErr">10 digit phone</div>
+</div>
+
+<div>
+<label>Department</label>
+<select id="department">
+<option value="">Select</option>
+<option>General Medicine</option>
+<option>Pediatrics</option>
+<option>Orthopedics</option>
+<option>Dermatology</option>
+</select>
+</div>
+
+<div>
+<label>Doctor</label>
+<select id="doctor">
+<option value="">Select Doctor</option>
+</select>
+</div>
+
+<div>
+<label>Date</label>
+<input type="date" id="appointmentDate">
+</div>
+
+<div>
+<label>Slot</label>
+<select id="slots">
+<option value="">Select Slot</option>
+</select>
+</div>
+
+<div class="full-width">
+<input type="submit" value="Book Appointment" class="sub">
+</div>
+
+</form>
+
+<div id="summaryBox" style="display:none">
+<h3>✅ Appointment Confirmed</h3>
+<div id="summaryContent" class="summary"></div>
+</div>
+
+</div>
+
+<!-- DOCTORS -->
+<div id="doctorPage" class="container" style="display:none">
+<h2>Doctors Available</h2>
+<table>
+<tr><th>Department</th><th>Doctors</th></tr>
+<tr><td>General Medicine</td><td>Dr. Rajiv Sharma, Dr. Suman Mehta</td></tr>
+<tr><td>Pediatrics</td><td>Dr. Priya Reddy, Dr. Samba Shivarao</td></tr>
+<tr><td>Orthopedics</td><td>Dr. Ravi Kumar, Dr. Gabbar Singh</td></tr>
+<tr><td>Dermatology</td><td>Dr. Aman Patel, Dr. Nisha Pati</td></tr>
+</table>
+</div>
+
+<!-- APPOINTMENTS -->
+<div id="appointmentsPage" class="container" style="display:none">
+
+<h2>My Appointments</h2>
+
+<input id="search" placeholder="Search patient">
+
+<table id="appointmentTable"></table>
+
+</div>
+
+<script>
+
+/* PAGE SWITCH */
+function showPage(id){
+document.querySelectorAll(".container").forEach(p=>p.style.display="none");
+document.getElementById(id).style.display="block";
+if(id==="appointmentsPage") displayAppointments();
+}
+
+/* DATA */
+const doctors={
+"General Medicine":["Dr. Rajiv Sharma","Dr. Suman Mehta"],
+"Pediatrics":["Dr. Priya Reddy","Dr. Samba Shivarao"],
+"Orthopedics":["Dr. Ravi Kumar","Dr. Gabbar Singh"],
+"Dermatology":["Dr. Aman Patel","Dr. Nisha Pati"]
+};
+
+const allSlots=["9:00 AM","10:00 AM","12:00 PM","3:00 PM","4:00 PM"];
+
+let appointments=
+JSON.parse(localStorage.getItem("medibook_appointments"))||[];
+
+/* ELEMENTS */
+const form=document.getElementById("appointmentForm");
+const dept=document.getElementById("department");
+const doctor=document.getElementById("doctor");
+const slots=document.getElementById("slots");
+const dateInput=document.getElementById("appointmentDate");
+const search=document.getElementById("search");
+const table=document.getElementById("appointmentTable");
+
+/* MIN DATE */
+dateInput.min=new Date().toISOString().split("T")[0];
+
+/* LOAD DOCTORS */
+dept.onchange=()=>{
+doctor.innerHTML="<option>Select Doctor</option>";
+(doctors[dept.value]||[]).forEach(d=>{
+doctor.innerHTML+=`<option>${d}</option>`;
+});
+};
+
+/* LOAD SLOTS */
+doctor.onchange=dateInput.onchange=()=>{
+slots.innerHTML="<option>Select Slot</option>";
+
+allSlots.forEach(s=>{
+let booked=appointments.some(a=>
+a.doctor===doctor.value &&
+a.date===dateInput.value &&
+a.slot===s &&
+a.status==="Booked");
+
+slots.innerHTML+=
+`<option ${booked?"disabled":""}>
+${s}${booked?" (Booked)":""}
+</option>`;
+});
+};
+
+/* VALIDATION */
+function validate(){
+let ok=true;
+
+if(!patientName.value){nameErr.style.display="block";ok=false;}
+else nameErr.style.display="none";
+
+if(patientAge.value<1||patientAge.value>120){ageErr.style.display="block";ok=false;}
+else ageErr.style.display="none";
+
+if(!/^\S+@\S+\.\S+$/.test(patientEmail.value)){emailErr.style.display="block";ok=false;}
+else emailErr.style.display="none";
+
+if(!/^\d{10}$/.test(patientPhone.value)){phoneErr.style.display="block";ok=false;}
+else phoneErr.style.display="none";
+
+return ok;
+}
+
+/* BOOK */
+form.onsubmit=e=>{
+e.preventDefault();
+if(!validate())return;
+
+let app={
+bookingID:"BK"+Date.now(),
+name:patientName.value,
+age:patientAge.value,
+email:patientEmail.value,
+phone:patientPhone.value,
+department:dept.value,
+doctor:doctor.value,
+date:dateInput.value,
+slot:slots.value,
+status:"Booked"
+};
+
+appointments.push(app);
+localStorage.setItem("medibook_appointments",JSON.stringify(appointments));
+
+summaryBox.style.display="block";
+summaryContent.innerHTML=`
+<b>ID:</b> ${app.bookingID}<br>
+<b>Name:</b> ${app.name}<br>
+<b>Doctor:</b> ${app.doctor}<br>
+<b>Date:</b> ${app.date}<br>
+<b>Slot:</b> ${app.slot}
+`;
+
+form.reset();
+};
+
+/* DISPLAY TABLE */
+function displayAppointments(data=appointments){
+
+table.innerHTML=
+`<tr>
+<th>ID</th><th>Name</th><th>Doctor</th>
+<th>Date</th><th>Slot</th>
+<th>Status</th><th>Action</th>
+</tr>`;
+
+if(!data.length){
+table.innerHTML+=`<tr><td colspan=7>No data</td></tr>`;
+return;
+}
+
+data.forEach(app=>{
+let i=appointments.indexOf(app);
+table.innerHTML+=`
+<tr>
+<td>${app.bookingID}</td>
+<td>${app.name}</td>
+<td>${app.doctor}</td>
+<td>${app.date}</td>
+<td>${app.slot}</td>
+<td>${app.status}</td>
+<td>
+<button class="cancel-btn"
+onclick="cancelAppointment(${i})">
+Cancel
+</button>
+</td>
+</tr>`;
+});
+}
+
+/* CANCEL */
+function cancelAppointment(i){
+if(!confirm("Cancel appointment?"))return;
+appointments.splice(i,1);
+localStorage.setItem("medibook_appointments",JSON.stringify(appointments));
+displayAppointments();
+}
+
+/* SEARCH */
+search.onkeyup=()=>{
+let val=search.value.toLowerCase();
+displayAppointments(
+appointments.filter(a=>a.name.toLowerCase().includes(val))
+);
+};
+
+/* THEME TOGGLE */
+function toggleTheme(){
+document.documentElement.classList.toggle("dark");
+
+if(document.documentElement.classList.contains("dark")){
+themeBtn.textContent="☀️ Light Mode";
+localStorage.setItem("medibook_theme","dark");
+}else{
+themeBtn.textContent="🌙 Dark Mode";
+localStorage.setItem("medibook_theme","light");
+}
+}
+
+/* LOAD SAVED THEME */
+if(localStorage.getItem("medibook_theme")==="dark"){
+document.documentElement.classList.add("dark");
+themeBtn.textContent="☀️ Light Mode";
+}
+
+/* INIT */
+displayAppointments();
+
+</script>
+
+</body>
+</html>
