@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Library System</title>
+  <style>
+    *{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial;
+}
+
+body{
+  background:#f4f4f4;
+  color:#222;
+  transition:0.3s;
+}
+
+header{
+  background:#2c3e50;
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+
+nav{
+  margin-top:10px;
+}
+
+nav a{
+  color:white;
+  text-decoration:none;
+  margin:10px;
+}
+
+#themeBtn{
+  margin-top:15px;
+  padding:10px;
+  border:none;
+  cursor:pointer;
+}
+
+section{
+  padding:20px;
+}
+
+.categories{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.cat-btn{
+  padding:10px 20px;
+  border:none;
+  background:#3498db;
+  color:white;
+  cursor:pointer;
+  border-radius:5px;
+}
+
+.cat-btn:hover{
+  background:#2980b9;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+}
+
+button{
+  padding:10px 20px;
+  margin-top:20px;
+  background:green;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.8;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+table,th,td{
+  border:1px solid #ccc;
+}
+
+th,td{
+  padding:12px;
+  text-align:center;
+}
+
+.available{
+  color:green;
+  font-weight:bold;
+}
+
+.reserved{
+  color:red;
+  font-weight:bold;
+}
+
+.returned{
+  color:blue;
+  font-weight:bold;
+}
+
+.progress-container{
+  width:100%;
+  background:#ddd;
+  height:20px;
+  border-radius:10px;
+  margin-top:20px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:green;
+  border-radius:10px;
+}
+
+.dark-mode{
+  background:#1e1e1e;
+  color:white;
+}
+
+.dark-mode table{
+  background:#333;
+  color:white;
+}
+
+@media(max-width:768px){
+
+  nav{
+    display:flex;
+    flex-direction:column;
+  }
+
+}
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1>📚 Smart Library Reservation System</h1>
+
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Books</a>
+      <a href="#">Reservations</a>
+      <a href="#">Contact</a>
+    </nav>
+
+    <button id="themeBtn">🌙 Dark Mode</button>
+  </header>
+
+  <!-- CATEGORY SECTION -->
+  <section class="category-section">
+    <h2>Book Categories</h2>
+
+    <div class="categories">
+      <button class="cat-btn">Fiction</button>
+      <button class="cat-btn">Science</button>
+      <button class="cat-btn">Technology</button>
+      <button class="cat-btn">History</button>
+    </div>
+  </section>
+
+  <!-- RESERVATION FORM -->
+  <section class="form-section">
+
+    <h2>Book Reservation Form</h2>
+
+    <form id="reservationForm">
+
+      <div class="form-grid">
+
+        <div>
+          <label>Student Name</label>
+          <input type="text" id="name" required>
+        </div>
+
+        <div>
+          <label>USN/Register Number</label>
+          <input type="text" id="usn" required>
+        </div>
+
+        <div>
+          <label>Department</label>
+          <input type="text" id="dept" required>
+        </div>
+
+        <div>
+          <label>Email ID</label>
+          <input type="email" id="email" required>
+        </div>
+
+        <div>
+          <label>Contact Number</label>
+          <input type="text" id="contact" required>
+        </div>
+
+        <div>
+          <label>Book Category</label>
+
+          <select id="category" required>
+            <option value="">Select</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Science">Science</option>
+            <option value="Technology">Technology</option>
+            <option value="History">History</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Book Name</label>
+
+          <select id="book" required>
+            <option value="">Select Book</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Reservation Date</label>
+          <input type="date" id="date" required>
+        </div>
+
+        <div>
+          <label>Borrow Duration (Days)</label>
+          <input type="number" id="duration" required>
+        </div>
+
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <button type="submit">Reserve Book</button>
+
+    </form>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="search-section">
+
+    <h2>Search & Filter</h2>
+
+    <input type="text" id="searchInput" placeholder="Search by Student Name">
+
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="summary-section">
+
+    <h2>Reservation Summary</h2>
+
+    <div id="summary"></div>
+
+  </section>
+
+  <!-- TABLE -->
+  <section class="table-section">
+
+    <h2>Reserved Books</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Student</th>
+          <th>Book</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="reservationTable"></tbody>
+
+    </table>
+
+  </section>
+
+  <!-- MOST BORROWED -->
+  <section class="stats">
+    <h3 id="mostBorrowed"></h3>
+  </section>
+
+  <script>
+const books = {
+  Fiction: [
+    {name:"Harry Potter", stock:2},
+    {name:"The Alchemist", stock:1}
+  ],
+
+  Science: [
+    {name:"Physics Fundamentals", stock:2},
+    {name:"Biology Basics", stock:1}
+  ],
+
+  Technology: [
+    {name:"Java Programming", stock:3},
+    {name:"Web Development", stock:2}
+  ],
+
+  History: [
+    {name:"World War II", stock:1},
+    {name:"Indian History", stock:2}
+  ]
+};
+
+const category = document.getElementById("category");
+const book = document.getElementById("book");
+const form = document.getElementById("reservationForm");
+const table = document.getElementById("reservationTable");
+const summary = document.getElementById("summary");
+const searchInput = document.getElementById("searchInput");
+const progressBar = document.getElementById("progressBar");
+
+let reservations = JSON.parse(localStorage.getItem("reservations")) || [];
+
+displayReservations();
+
+// LOAD BOOKS
+category.addEventListener("change", () => {
+
+  book.innerHTML = `<option value="">Select Book</option>`;
+
+  books[category.value].forEach(b => {
+
+    let option = document.createElement("option");
+
+    option.value = b.name;
+
+    option.textContent = `${b.name} (${b.stock} left)`;
+
+    if(b.stock <= 0){
+      option.disabled = true;
+    }
+
+    book.appendChild(option);
+  });
+});
+
+// PROGRESS BAR
+form.addEventListener("input", () => {
+
+  let filled = form.querySelectorAll("input,select");
+
+  let count = 0;
+
+  filled.forEach(f => {
+    if(f.value !== ""){
+      count++;
+    }
+  });
+
+  let percent = (count / filled.length) * 100;
+
+  progressBar.style.width = percent + "%";
+});
+
+// FORM SUBMIT
+form.addEventListener("submit", (e) => {
+
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const usn = document.getElementById("usn").value;
+  const dept = document.getElementById("dept").value;
+  const email = document.getElementById("email").value;
+  const contact = document.getElementById("contact").value;
+  const date = document.getElementById("date").value;
+
+  // VALIDATIONS
+  let usnPattern = /^[A-Za-z0-9]+$/;
+  let phonePattern = /^[0-9]{10}$/;
+
+  if(!usnPattern.test(usn)){
+    alert("Invalid USN");
+    return;
+  }
+
+  if(!phonePattern.test(contact)){
+    alert("Invalid Contact Number");
+    return;
+  }
+
+  let today = new Date().toISOString().split("T")[0];
+
+  if(date < today){
+    alert("Date cannot be in past");
+    return;
+  }
+
+  const reservation = {
+
+    id: "LIB" + Date.now(),
+    name,
+    usn,
+    dept,
+    email,
+    contact,
+    category: category.value,
+    book: book.value,
+    date,
+    duration: document.getElementById("duration").value,
+    status: "Reserved"
+  };
+
+  reservations.push(reservation);
+
+  localStorage.setItem("reservations", JSON.stringify(reservations));
+
+  alert("Reservation Successful");
+
+  displayReservations();
+
+  showSummary(reservation);
+
+  calculateMostBorrowed();
+
+  downloadReceipt(reservation);
+
+  form.reset();
+
+  progressBar.style.width = "0%";
+});
+
+// DISPLAY TABLE
+function displayReservations(){
+
+  table.innerHTML = "";
+
+  reservations.forEach((r,index) => {
+
+    let row = `
+      <tr>
+        <td>${r.id}</td>
+        <td>${r.name}</td>
+        <td>${r.book}</td>
+        <td>${r.category}</td>
+        <td>${r.date}</td>
+        <td class="reserved">${r.status}</td>
+
+        <td>
+          <button onclick="editReservation(${index})">Edit</button>
+
+          <button onclick="cancelReservation(${index})">
+            Cancel
+          </button>
+        </td>
+      </tr>
+    `;
+
+    table.innerHTML += row;
+  });
+}
+
+// SUMMARY
+function showSummary(r){
+
+  summary.innerHTML = `
+    <p><b>Reservation ID:</b> ${r.id}</p>
+    <p><b>Student:</b> ${r.name}</p>
+    <p><b>Book:</b> ${r.book}</p>
+    <p><b>Status:</b> ${r.status}</p>
+  `;
+}
+
+// EDIT
+function editReservation(index){
+
+  let r = reservations[index];
+
+  document.getElementById("name").value = r.name;
+  document.getElementById("usn").value = r.usn;
+  document.getElementById("dept").value = r.dept;
+  document.getElementById("email").value = r.email;
+  document.getElementById("contact").value = r.contact;
+  document.getElementById("date").value = r.date;
+  document.getElementById("duration").value = r.duration;
+
+  reservations.splice(index,1);
+
+  localStorage.setItem("reservations", JSON.stringify(reservations));
+
+  displayReservations();
+}
+
+// CANCEL
+function cancelReservation(index){
+
+  if(confirm("Cancel Reservation?")){
+
+    reservations[index].status = "Cancelled";
+
+    localStorage.setItem("reservations", JSON.stringify(reservations));
+
+    displayReservations();
+  }
+}
+
+// SEARCH
+searchInput.addEventListener("keyup", () => {
+
+  let value = searchInput.value.toLowerCase();
+
+  let rows = table.querySelectorAll("tr");
+
+  rows.forEach(row => {
+
+    let text = row.innerText.toLowerCase();
+
+    row.style.display = text.includes(value) ? "" : "none";
+  });
+});
+
+// THEME TOGGLE
+document.getElementById("themeBtn").addEventListener("click", () => {
+
+  document.body.classList.toggle("dark-mode");
+});
+
+// MOST BORROWED
+function calculateMostBorrowed(){
+
+  let count = {};
+
+  reservations.forEach(r => {
+
+    count[r.category] = (count[r.category] || 0) + 1;
+  });
+
+  let max = "";
+
+  let maxCount = 0;
+
+  for(let c in count){
+
+    if(count[c] > maxCount){
+
+      maxCount = count[c];
+
+      max = c;
+    }
+  }
+
+  document.getElementById("mostBorrowed").innerHTML =
+    "📖 Most Borrowed Category: " + max;
+}
+
+// DOWNLOAD RECEIPT
+function downloadReceipt(r){
+
+  let content = `
+Reservation Receipt
+
+ID: ${r.id}
+Student: ${r.name}
+Book: ${r.book}
+Category: ${r.category}
+Date: ${r.date}
+Status: ${r.status}
+  `;
+
+  let blob = new Blob([content], {type:"text/plain"});
+
+  let a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+
+  a.download = "receipt.txt";
+
+  a.click();
+}
+
+calculateMostBorrowed();
+  </script>
+
+</body>
+</html>
