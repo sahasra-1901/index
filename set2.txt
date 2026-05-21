@@ -1,0 +1,143 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// --- Custom Exceptions ---
+class InvalidVehicleDetailsException extends Exception {
+    public InvalidVehicleDetailsException(String message) { super(message); }
+}
+
+class IncorrectSignalOperationException extends Exception {
+    public IncorrectSignalOperationException(String message) { super(message); }
+}
+
+class DuplicateVehicleEntryException extends Exception {
+    public DuplicateVehicleEntryException(String message) { super(message); }
+}
+
+// --- Base Class: Vehicle (Encapsulation & Abstraction) ---
+abstract class Vehicle {
+    private String vehicleID;
+    private String vehicleType;
+    private String junctionName;
+    private String signalStatus;
+
+    public Vehicle(String vehicleID, String vehicleType, String junctionName, String signalStatus) {
+        this.vehicleID = vehicleID;
+        this.vehicleType = vehicleType;
+        this.junctionName = junctionName;
+        this.signalStatus = signalStatus;
+    }
+
+    // Getters and Setters
+    public String getVehicleID() { return vehicleID; }
+    public String getVehicleType() { return vehicleType; }
+    public String getJunctionName() { return junctionName; }
+    public String getSignalStatus() { return signalStatus; }
+    public void setSignalStatus(String status) { this.signalStatus = status; }
+
+    public abstract void processPassage();
+}
+
+// --- Derived Class: EmergencyVehicle (Inheritance & Polymorphism) ---
+class EmergencyVehicle extends Vehicle {
+    private String emergencyCategory;
+
+    public EmergencyVehicle(String vehicleID, String vehicleType, String junctionName, String signalStatus, String emergencyCategory) {
+        super(vehicleID, vehicleType, junctionName, signalStatus);
+        this.emergencyCategory = emergencyCategory;
+    }
+
+    @Override
+    public void processPassage() {
+        System.out.println("ALERT: " + emergencyCategory + " detected at " + getJunctionName());
+        if (getSignalStatus().equalsIgnoreCase("RED")) {
+            setSignalStatus("GREEN");
+            System.out.println("Traffic signal changed to GREEN for emergency clearance.");
+        }
+        System.out.println("Current Signal Status: " + getSignalStatus());
+    }
+}
+
+// --- Derived Class: NormalVehicle ---
+class NormalVehicle extends Vehicle {
+    public NormalVehicle(String vehicleID, String vehicleType, String junctionName, String signalStatus) {
+        super(vehicleID, vehicleType, junctionName, signalStatus);
+    }
+
+    @Override
+    public void processPassage() {
+        System.out.println(getVehicleType() + " is waiting at signal.");
+        System.out.println("Current Signal Status: " + getSignalStatus());
+    }
+}
+
+// --- Main Application Class ---
+ class TrafficManagementSystem {
+    private static ArrayList<Vehicle> vehicleList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("\n--- Emergency Vehicle Priority System ---");
+            System.out.println("1. Add Vehicle / Detect Entry");
+            System.out.println("2. Display All Records");
+            System.out.println("3. Exit");
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            if (choice == 3) break;
+
+            switch (choice) {
+                case 1:
+                    try {
+                        System.out.print("Enter Vehicle ID: ");
+                        String id = sc.nextLine();
+                        if (id.isEmpty()) throw new InvalidVehicleDetailsException("ERROR: Invalid Vehicle ID");
+
+                        // Check for duplicates
+                        for (Vehicle v : vehicleList) {
+                            if (v.getVehicleID().equalsIgnoreCase(id)) 
+                                throw new DuplicateVehicleEntryException("ERROR: Duplicate Vehicle Entry");
+                        }
+
+                        System.out.print("Enter Vehicle Type (Ambulance/Fire Truck/Car/Bike): ");
+                        String type = sc.nextLine();
+                        System.out.print("Enter Junction Name: ");
+                        String junction = sc.nextLine();
+                        System.out.print("Enter Initial Signal Status (RED/GREEN): ");
+                        String signal = sc.nextLine();
+                        
+                        if(!signal.equalsIgnoreCase("RED") && !signal.equalsIgnoreCase("GREEN"))
+                            throw new IncorrectSignalOperationException("ERROR: Invalid Signal Status");
+
+                        if (type.equalsIgnoreCase("Ambulance") || type.equalsIgnoreCase("Fire Truck")) {
+                            EmergencyVehicle ev = new EmergencyVehicle(id, type, junction, signal, type);
+                            vehicleList.add(ev);
+                            ev.processPassage();
+                        } else {
+                            NormalVehicle nv = new NormalVehicle(id, type, junction, signal);
+                            vehicleList.add(nv);
+                            nv.processPassage();
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                case 2:
+                    System.out.println("\n--- Registered Vehicle Records ---");
+                    for (Vehicle v : vehicleList) {
+                        System.out.println("ID: " + v.getVehicleID() + " | Type: " + v.getVehicleType() + 
+                                           " | Junction: " + v.getJunctionName() + " | Signal: " + v.getSignalStatus());
+                    }
+                    break;
+
+                default:
+                    System.out.println("Invalid Choice.");
+            }
+        }
+        sc.close();
+    }
+}
