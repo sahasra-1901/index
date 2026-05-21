@@ -1,6 +1,6 @@
 import java.util.*;
 
-// ================= USER DEFINED EXCEPTIONS =================
+// ================= CUSTOM EXCEPTIONS =================
 
 class InvalidTouristIDException extends Exception {
     public InvalidTouristIDException(String message) {
@@ -23,17 +23,21 @@ class IncorrectDestinationException extends Exception {
 // ================= ABSTRACT CLASS =================
 
 abstract class Tourist {
+
+    // Encapsulation (private variables)
     private String touristId;
     private String touristName;
     private String destinationName;
     private String bookingStatus;
 
     // Parameterized Constructor
-    public Tourist(String touristId, String touristName, String destinationName)
+    public Tourist(String touristId, String touristName,
+                   String destinationName)
             throws InvalidTouristIDException {
 
         if (touristId == null || touristId.trim().isEmpty()) {
-            throw new InvalidTouristIDException("ERROR: Invalid Tourist ID");
+            throw new InvalidTouristIDException(
+                    "ERROR: Invalid Tourist ID");
         }
 
         this.touristId = touristId;
@@ -42,7 +46,7 @@ abstract class Tourist {
         this.bookingStatus = "PENDING";
     }
 
-    // Getters and Setters (Encapsulation)
+    // Getters and Setters
     public String getTouristId() {
         return touristId;
     }
@@ -74,9 +78,10 @@ abstract class Tourist {
     // Abstraction
     abstract void assignGuide();
 
-    // Method to display details
+    // Display Method
     public void displayDetails() {
-        System.out.println("\nTourist ID: " + touristId);
+        System.out.println("\n-------------------------");
+        System.out.println("Tourist ID: " + touristId);
         System.out.println("Tourist Name: " + touristName);
         System.out.println("Destination Name: " + destinationName);
         System.out.println("Booking Status: " + bookingStatus);
@@ -85,11 +90,11 @@ abstract class Tourist {
 
 // ================= INHERITANCE =================
 
-// Foreign Tourist Class
+// Foreign Tourist
 class ForeignTourist extends Tourist {
 
     public ForeignTourist(String touristId, String touristName,
-                           String destinationName)
+                          String destinationName)
             throws InvalidTouristIDException {
 
         super(touristId, touristName, destinationName);
@@ -100,32 +105,15 @@ class ForeignTourist extends Tourist {
     void assignGuide() {
         System.out.println("\nALERT: Foreign Tourist detected for "
                 + getDestinationName() + " Tour.");
-        System.out.println("Special multilingual guide assigned successfully.");
+        System.out.println(
+                "Special multilingual guide assigned successfully.");
         setBookingStatus("CONFIRMED");
-        System.out.println("Booking Status: " + getBookingStatus());
+        System.out.println(
+                "Booking Status: " + getBookingStatus());
     }
 }
 
-// Senior Citizen Tourist Class
-class SeniorTourist extends Tourist {
-
-    public SeniorTourist(String touristId, String touristName,
-                          String destinationName)
-            throws InvalidTouristIDException {
-
-        super(touristId, touristName, destinationName);
-    }
-
-    @Override
-    void assignGuide() {
-        System.out.println("\nALERT: Senior Citizen Tourist detected.");
-        System.out.println("Special assistance guide assigned successfully.");
-        setBookingStatus("CONFIRMED");
-        System.out.println("Booking Status: " + getBookingStatus());
-    }
-}
-
-// Domestic Tourist Class
+// Domestic Tourist
 class DomesticTourist extends Tourist {
 
     public DomesticTourist(String touristId, String touristName,
@@ -141,39 +129,52 @@ class DomesticTourist extends Tourist {
                 + getDestinationName() + ".");
         System.out.println("Guide assigned normally.");
         setBookingStatus("CONFIRMED");
-        System.out.println("Booking Status: " + getBookingStatus());
+        System.out.println(
+                "Booking Status: " + getBookingStatus());
+    }
+}
+
+// Senior Citizen Tourist
+class SeniorTourist extends Tourist {
+
+    public SeniorTourist(String touristId, String touristName,
+                         String destinationName)
+            throws InvalidTouristIDException {
+
+        super(touristId, touristName, destinationName);
+    }
+
+    @Override
+    void assignGuide() {
+        System.out.println(
+                "\nALERT: Senior Citizen Tourist detected.");
+        System.out.println(
+                "Special assistance guide assigned successfully.");
+        setBookingStatus("CONFIRMED");
+        System.out.println(
+                "Booking Status: " + getBookingStatus());
     }
 }
 
 // ================= MAIN CLASS =================
 
-public class SmartTourismGuideSystem {
+class SmartTourismGuideSystem {
 
-    // Valid destinations
-    static ArrayList<String> validDestinations = new ArrayList<>(
-            Arrays.asList("Mysore Palace", "Coorg", "Ooty", "Hampi", "Goa"));
+    static ArrayList<Tourist> touristList =
+            new ArrayList<>();
 
-    // ArrayList to store tourists
-    static ArrayList<Tourist> touristList = new ArrayList<>();
+    // Check Duplicate Booking
+    public static boolean isDuplicate(String id) {
 
-    // Check duplicate booking
-    public static boolean isDuplicate(String touristId) {
         for (Tourist tourist : touristList) {
-            if (tourist.getTouristId().equalsIgnoreCase(touristId)) {
+
+            if (tourist.getTouristId()
+                    .equalsIgnoreCase(id)) {
+
                 return true;
             }
         }
         return false;
-    }
-
-    // Validate destination
-    public static void validateDestination(String destination)
-            throws IncorrectDestinationException {
-
-        if (!validDestinations.contains(destination)) {
-            throw new IncorrectDestinationException(
-                    "ERROR: Incorrect Destination Entry");
-        }
     }
 
     public static void main(String[] args) {
@@ -182,67 +183,144 @@ public class SmartTourismGuideSystem {
 
         while (true) {
 
-            System.out.println("\n===== SMART TOURISM GUIDE SYSTEM =====");
+            System.out.println(
+                    "\n===== SMART TOURISM GUIDE SYSTEM =====");
+
             System.out.println("1. Add Tourist");
-            System.out.println("2. View All Tourists");
+            System.out.println("2. View Tourists");
             System.out.println("3. Update Booking Status");
             System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
 
+            System.out.print("Enter Choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
 
             switch (choice) {
 
+                // ================= ADD TOURIST =================
+
                 case 1:
 
                     try {
-                        System.out.print("Enter Tourist ID: ");
+
+                        System.out.print(
+                                "Enter Tourist ID: ");
                         String id = sc.nextLine();
 
+                        // Duplicate Check
                         if (isDuplicate(id)) {
                             throw new DuplicateBookingException(
                                     "ERROR: Duplicate Booking Found");
                         }
 
-                        System.out.print("Enter Tourist Name: ");
+                        System.out.print(
+                                "Enter Tourist Name: ");
                         String name = sc.nextLine();
 
-                        System.out.println("Select Tourist Type:");
-                        System.out.println("1. Foreign Tourist");
-                        System.out.println("2. Domestic Tourist");
-                        System.out.println("3. Senior Citizen");
+                        // Tourist Type Menu
+                        System.out.println(
+                                "\nSelect Tourist Type:");
+                        System.out.println(
+                                "1. Foreign Tourist");
+                        System.out.println(
+                                "2. Domestic Tourist");
+                        System.out.println(
+                                "3. Senior Citizen");
 
-                        int typeChoice = sc.nextInt();
+                        System.out.print(
+                                "Enter Choice: ");
+                        int touristType =
+                                sc.nextInt();
                         sc.nextLine();
 
-                        System.out.print("Enter Destination Name: ");
-                        String destination = sc.nextLine();
+                        // Destination Menu
+                        System.out.println(
+                                "\nSelect Destination:");
+                        System.out.println(
+                                "1. Mysore Palace");
+                        System.out.println(
+                                "2. Coorg");
+                        System.out.println(
+                                "3. Ooty");
+                        System.out.println(
+                                "4. Hampi");
+                        System.out.println(
+                                "5. Goa");
 
-                        validateDestination(destination);
+                        System.out.print(
+                                "Enter Choice: ");
+                        int destinationChoice =
+                                sc.nextInt();
+                        sc.nextLine();
 
-                        Tourist tourist = null;
+                        String destination = "";
 
-                        // POLYMORPHISM
-                        switch (typeChoice) {
+                        switch (destinationChoice) {
 
                             case 1:
-                                tourist = new ForeignTourist(
-                                        id, name, destination);
+                                destination =
+                                        "Mysore Palace";
                                 break;
 
                             case 2:
-                                tourist = new DomesticTourist(
-                                        id, name, destination);
+                                destination =
+                                        "Coorg";
                                 break;
 
                             case 3:
-                                tourist = new SeniorTourist(
-                                        id, name, destination);
+                                destination =
+                                        "Ooty";
+                                break;
+
+                            case 4:
+                                destination =
+                                        "Hampi";
+                                break;
+
+                            case 5:
+                                destination =
+                                        "Goa";
                                 break;
 
                             default:
-                                System.out.println("Invalid Tourist Type!");
+                                throw new
+                                        IncorrectDestinationException(
+                                        "ERROR: Incorrect Destination Entry"
+                                );
+                        }
+
+                        Tourist tourist = null;
+
+                        // Polymorphism
+                        switch (touristType) {
+
+                            case 1:
+                                tourist =
+                                        new ForeignTourist(
+                                                id,
+                                                name,
+                                                destination);
+                                break;
+
+                            case 2:
+                                tourist =
+                                        new DomesticTourist(
+                                                id,
+                                                name,
+                                                destination);
+                                break;
+
+                            case 3:
+                                tourist =
+                                        new SeniorTourist(
+                                                id,
+                                                name,
+                                                destination);
+                                break;
+
+                            default:
+                                System.out.println(
+                                        "Invalid Tourist Type!");
                                 continue;
                         }
 
@@ -251,64 +329,91 @@ public class SmartTourismGuideSystem {
                         // Runtime Polymorphism
                         tourist.assignGuide();
 
-                    } catch (InvalidTouristIDException |
-                             DuplicateBookingException |
-                             IncorrectDestinationException e) {
+                    } catch (
+                            InvalidTouristIDException |
+                            DuplicateBookingException |
+                            IncorrectDestinationException e) {
 
-                        System.out.println(e.getMessage());
+                        System.out.println(
+                                e.getMessage());
                     }
 
                     break;
 
+                // ================= VIEW TOURISTS =================
+
                 case 2:
 
                     if (touristList.isEmpty()) {
-                        System.out.println("No Tourist Records Found!");
+
+                        System.out.println(
+                                "No Tourist Records Found!");
+
                     } else {
 
-                        System.out.println("\n===== TOURIST DETAILS =====");
+                        System.out.println(
+                                "\n===== TOURIST DETAILS =====");
 
-                        for (Tourist tourist : touristList) {
+                        for (Tourist tourist :
+                                touristList) {
+
                             tourist.displayDetails();
                         }
                     }
 
                     break;
 
+                // ================= UPDATE STATUS =================
+
                 case 3:
 
-                    System.out.print("Enter Tourist ID: ");
-                    String updateId = sc.nextLine();
+                    System.out.print(
+                            "Enter Tourist ID: ");
+
+                    String updateId =
+                            sc.nextLine();
 
                     boolean found = false;
 
-                    for (Tourist tourist : touristList) {
+                    for (Tourist tourist :
+                            touristList) {
 
                         if (tourist.getTouristId()
-                                .equalsIgnoreCase(updateId)) {
+                                .equalsIgnoreCase(
+                                        updateId)) {
 
-                            tourist.setBookingStatus("CONFIRMED");
+                            tourist.setBookingStatus(
+                                    "CONFIRMED");
 
                             System.out.println(
-                                    "Booking status updated successfully!");
+                                    "Booking Status Updated Successfully!");
+
                             found = true;
                             break;
                         }
                     }
 
                     if (!found) {
-                        System.out.println("Tourist ID not found!");
+
+                        System.out.println(
+                                "Tourist ID Not Found!");
                     }
 
                     break;
 
+                // ================= EXIT =================
+
                 case 4:
-                    System.out.println("Exiting Program...");
+
+                    System.out.println(
+                            "Exiting Program...");
                     sc.close();
                     System.exit(0);
 
                 default:
-                    System.out.println("Invalid Choice!");
+
+                    System.out.println(
+                            "Invalid Choice!");
             }
         }
     }
