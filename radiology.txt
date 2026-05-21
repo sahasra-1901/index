@@ -1,0 +1,283 @@
+import java.util.*;
+
+class InvalidScanTypeException extends Exception {
+ public InvalidScanTypeException(String message) {
+ super(message);
+ }
+}
+
+class MaxRecordsExceededException extends Exception {
+ public MaxRecordsExceededException(String message) {
+ super(message);
+ }
+}
+
+
+class Patient {
+    private String patientId;
+    private String name;           ---------> Encapsulation
+    private int age;
+
+    public Patient(String patientId, String name, int age ) {
+       
+     if(age < 0) {
+     throw new IllegalArgumentException("Age cannot be negative" );
+     }
+       
+        this.patientId = patientId;
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+   public int getAge() {
+       return age;
+    }
+}
+-------------------------------------------------------------------------------------------
+
+abstract class ScanRecord {       -----> parent class used for inheritance  , cannot create objects directly   Abstraction
+    protected Patient patient;
+    protected String organScanned;
+    protected int durationMinutes;
+
+    public ScanRecord(Patient patient, String organScanned) {
+        this.patient = patient;
+        this.organScanned = organScanned;
+    }
+
+    public abstract double calculateBilling();
+                                                                                     --------> since billing,duration is diff for xray,mri,CT , parent class cannot decide the exact implementation.so these child classes must create their own out depending on diff types
+    public abstract void computeDuration();
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+   public String getOrganScanned() {
+       return organScanned;
+   }
+}
+------------------------------------------------------------------------------------------
+
+class XRayScan extends ScanRecord {                                              ------------->Inheritance
+    public XRayScan(Patient patient, String organScanned) {
+        super(patient, organScanned);
+        computeDuration();
+    }
+
+    @Override                                                                                          -------------> Method Overriding
+    public double calculateBilling() {
+        return 500 +
+                (organScanned.equalsIgnoreCase("arm")
+                        ? 100
+                        : 150);
+    }
+
+    @Override
+    public void computeDuration() {
+        durationMinutes = 10;
+    }
+}
+
+   @Override
+    public void computeDuration() {
+       if(organScanned.equalsIgnoreCase("arm")) {
+           durationMinutes = 4;
+       }
+       else {
+           durationMinutes = 10;
+       }
+   }
+}
+
+---------------------------------------------------------------------------------------
+class CTScan extends ScanRecord {
+    public CTScan(Patient patient, String organScanned) {
+        super(patient, organScanned);
+        computeDuration();
+    }
+
+    @Override
+    public double calculateBilling() {
+        return 2000 +
+                (organScanned.equalsIgnoreCase("chest")
+                        ? 200
+                        : 300);
+    }
+
+    @Override
+    public void computeDuration() {
+        durationMinutes = 20;
+    }
+}
+
+-----------------------------------------------------------------------------------------
+class MRIScan extends ScanRecord {
+    public MRIScan(Patient patient, String organScanned) {
+        super(patient, organScanned);
+        computeDuration();
+    }
+
+    @Override
+    public double calculateBilling() {
+        return 3000 +
+                (organScanned.equalsIgnoreCase("brain")
+                        ? 500
+                        : 300);
+    }
+
+    @Override
+    public void computeDuration() {
+         if(organScanned.equalsIgnoreCase("brain")) {
+            durationMinutes = 45;
+        }
+        else {
+           durationMinutes = 30;
+       }
+    }
+}
+-----------------------------------------------------------------------------------------------
+class ScanManager {
+    private List<ScanRecord> scans =
+            new ArrayList<>();                               ------------> creates a dynamic array list to store all scan objects
+--------------------------------------------------------------------------------------------------------
+    private final int MAX_RECORDS = 10;
+    public void addScan(ScanRecord scan) throws MaxRecordsExceededException {
+        if(scans.size() >= MAX_RECORDS) {
+          throw new MaxRecordsExceededException("Maximum scan records exceeded!" );
+        }
+        scans.add(scan);
+        System.out.println( "Record added successfully.");
+    }
+--------------------------------------------------------------------------------------------------------
+    public double calculateTotalProfit() {
+        double total = 0;
+        for (ScanRecord scan : scans) {
+            total += scan.calculateBilling();
+        }
+        return total;
+    }
+----------------------------------------------------------------------------------------------------
+    public void displayScans() {
+        for (ScanRecord scan : scans) {
+            System.out.println(
+                    "Patient: " +
+                    scan.getPatient().getName()
+                    + ", Scan Type: " +
+                    scan.getClass().getSimpleName()          ------>Returns class name ex:XRayScan
+                    + ", Organ: " +
+                    scan.getOrganScanned()
+                    + ", Duration: " +
+                    scan.getDurationMinutes()
+                    + " mins, Billing: Rs. " +
+                    scan.calculateBilling()
+            );
+        }
+    }
+-------------------------------------------------------------------------------------
+    public void analyzeLongDurationScans() {
+       System.out.println( "\n===== LONG DURATION SCANS =====" );
+       for(ScanRecord scan : scans) {
+          if(scan.getDurationMinutes() > 30) {
+             System.out.println(
+                 "Patient: "
+                 + scan.getPatient().getName()
+                 + ", Scan: "
+                 + scan.getClass().getSimpleName()
+                 + ", Organ: "
+                 + scan.getOrganScanned()
+                 + ", Duration: "
+                 + scan.getDurationMinutes()
+                 + " mins"
+              );
+          }
+      }
+   }
+}
+
+-----------------------------------------------------------------------------------------------------
+public class Main {
+  public static ScanRecord createScan(String scanType,Patient patient, String organ) throws InvalidScanTypeException {
+     if(scanType.equalsIgnoreCase("XRay")) {
+         return new XRayScan(patient,organ );
+     }
+     else if(scanType.equalsIgnoreCase("CT")) {
+         return new CTScan( patient, organ );
+     } 
+     else if(scanType.equalsIgnoreCase("MRI")) {
+         return new MRIScan( patient, organ );
+      }
+     else {
+        throw new InvalidScanTypeException("Invalid Scan Type: "+ scanType);
+      }
+  }
+
+    public static void main(String[] args) {
+        ScanManager manager = new ScanManager();
+        try {
+
+        Patient p1 =
+                new Patient("P001", "Jhon",45);
+        ScanRecord scan1 = createScan("MRI",p1,"brain");
+        manager.addScan(scan1);
+        System.out.println( "Bill: ₹"
+                                          + scan1.calculateBilling()
+                                          + ", Duration: "
+                                          + scan1.getDurationMinutes()
+                                          + " mins"
+         );
+
+        Patient p2 =
+                new Patient("P002", "Sara",30);
+        ScanRecord scan2 = createScan("CT",p2,"chest");
+        manager.addScan(scan2);
+        System.out.println( "Bill: ₹"
+                                                  + scan2.calculateBilling()
+                                                  + ", Duration: "
+                                                  + scan2.getDurationMinutes()
+                                                  + " mins"
+        );
+  
+        Patient p3 =
+                    new Patient("P003", "Alex", 22 );
+        ScanRecord scan3 = createScan("XRay",p3, "arm" );
+        manager.addScan(scan3);
+
+            createScan("PET", p1, "heart" );
+        }
+        catch(InvalidScanTypeException e) {
+            System.out.println(
+                    "\nERROR: "
+                    + e.getMessage()
+            );
+       }
+       catch(MaxRecordsExceededException e) {
+            System.out.println(
+                    "\nERROR: "
+                    + e.getMessage()
+            );
+       }
+       catch(IllegalArgumentException e) {
+            System.out.println(
+                    "\nERROR: "
+                    + e.getMessage()
+            );
+       }
+
+       manager.analyzeLongDurationScans();
+       manager.displayScans();
+       System.out.println("\nTotal Daily Profit: ₹"+ manager.calculateTotalProfit();
+    }
+}

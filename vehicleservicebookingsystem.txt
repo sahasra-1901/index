@@ -1,0 +1,352 @@
+import java.util.*;
+
+/* =========================
+   CUSTOM EXCEPTIONS
+========================= */
+
+class InvalidVehicleTypeException extends Exception {
+
+    public InvalidVehicleTypeException(String msg) {
+        super(msg);
+    }
+}
+
+class DuplicateBookingException extends Exception {
+
+    public DuplicateBookingException(String msg) {
+        super(msg);
+    }
+}
+
+/* =========================
+   VEHICLE BASE CLASS
+========================= */
+
+class Vehicle {
+
+    protected String vehicleNumber;
+    protected String ownerName;
+    protected String serviceType;
+
+    protected double cost;
+    protected int estimatedTime;
+
+    public Vehicle(String vehicleNumber,
+                   String ownerName,
+                   String serviceType) {
+
+        this.vehicleNumber = vehicleNumber;
+        this.ownerName = ownerName;
+        this.serviceType = serviceType;
+    }
+
+    public void calculateService() {
+
+        cost = 0;
+        estimatedTime = 0;
+    }
+
+    public void displayDetails() {
+
+        System.out.println("\nVehicle Number : " + vehicleNumber);
+        System.out.println("Owner Name     : " + ownerName);
+        System.out.println("Service Type   : " + serviceType);
+        System.out.println("Cost           : Rs." + cost);
+        System.out.println("Estimated Time : "
+                + estimatedTime + " hours");
+    }
+
+    public String getVehicleNumber() {
+        return vehicleNumber;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+}
+
+/* =========================
+   BIKE CLASS
+========================= */
+
+class Bike extends Vehicle {
+
+    public Bike(String vehicleNumber,
+                String ownerName,
+                String serviceType) {
+
+        super(vehicleNumber,
+                ownerName,
+                serviceType);
+    }
+
+    @Override
+    public void calculateService() {
+
+        if (serviceType.equalsIgnoreCase("General")) {
+
+            cost = 500;
+            estimatedTime = 2;
+        }
+
+        else if (serviceType.equalsIgnoreCase("Engine")) {
+
+            cost = 1500;
+            estimatedTime = 5;
+        }
+
+        else {
+
+            cost = 800;
+            estimatedTime = 3;
+        }
+    }
+
+    @Override
+    public void displayDetails() {
+
+        System.out.println("\n--- Bike Service ---");
+
+        super.displayDetails();
+    }
+}
+
+/* =========================
+   CAR CLASS
+========================= */
+
+class Car extends Vehicle {
+
+    public Car(String vehicleNumber,
+               String ownerName,
+               String serviceType) {
+
+        super(vehicleNumber,
+                ownerName,
+                serviceType);
+    }
+
+    @Override
+    public void calculateService() {
+
+        if (serviceType.equalsIgnoreCase("General")) {
+
+            cost = 2000;
+            estimatedTime = 4;
+        }
+
+        else if (serviceType.equalsIgnoreCase("Engine")) {
+
+            cost = 6000;
+            estimatedTime = 8;
+        }
+
+        else {
+
+            cost = 3000;
+            estimatedTime = 5;
+        }
+    }
+
+    @Override
+    public void displayDetails() {
+
+        System.out.println("\n--- Car Service ---");
+
+        super.displayDetails();
+    }
+}
+
+/* =========================
+   TRUCK CLASS
+========================= */
+
+class Truck extends Vehicle {
+
+    public Truck(String vehicleNumber,
+                 String ownerName,
+                 String serviceType) {
+
+        super(vehicleNumber,
+                ownerName,
+                serviceType);
+    }
+
+    @Override
+    public void calculateService() {
+
+        if (serviceType.equalsIgnoreCase("General")) {
+
+            cost = 4000;
+            estimatedTime = 6;
+        }
+
+        else if (serviceType.equalsIgnoreCase("Engine")) {
+
+            cost = 10000;
+            estimatedTime = 12;
+        }
+
+        else {
+
+            cost = 5000;
+            estimatedTime = 7;
+        }
+    }
+
+    @Override
+    public void displayDetails() {
+
+        System.out.println("\n--- Truck Service ---");
+
+        super.displayDetails();
+    }
+}
+
+/* =========================
+   MAIN CLASS
+========================= */
+
+class VehicleServiceBookingSystem {
+
+    static double totalIncome = 0;
+
+    static ArrayList<String> bookedVehicles =
+            new ArrayList<>();
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+
+            /* =========================
+               INPUT DETAILS
+            ========================= */
+
+            System.out.println("Enter Vehicle Number:");
+            String vehicleNumber = sc.nextLine();
+
+            /* =========================
+               TEST CASE 1
+               DUPLICATE BOOKING
+            ========================= */
+
+            if (bookedVehicles.contains(vehicleNumber)) {
+
+                throw new DuplicateBookingException(
+                        "Vehicle already booked"
+                );
+            }
+
+            bookedVehicles.add(vehicleNumber);
+
+            System.out.println("Enter Owner Name:");
+            String ownerName = sc.nextLine();
+
+            System.out.println(
+                    "Enter Vehicle Type (Bike/Car/Truck):"
+            );
+
+            String vehicleType = sc.nextLine();
+
+            System.out.println(
+                    "Enter Service Type:"
+            );
+
+            String serviceType = sc.nextLine();
+
+            Vehicle vehicle = null;
+
+            /* =========================
+               INHERITANCE
+            ========================= */
+
+            if (vehicleType.equalsIgnoreCase("Bike")) {
+
+                vehicle = new Bike(
+                        vehicleNumber,
+                        ownerName,
+                        serviceType
+                );
+            }
+
+            else if (vehicleType.equalsIgnoreCase("Car")) {
+
+                vehicle = new Car(
+                        vehicleNumber,
+                        ownerName,
+                        serviceType
+                );
+            }
+
+            else if (vehicleType.equalsIgnoreCase("Truck")) {
+
+                vehicle = new Truck(
+                        vehicleNumber,
+                        ownerName,
+                        serviceType
+                );
+            }
+
+            /* =========================
+               TEST CASE 2
+               INVALID VEHICLE TYPE
+            ========================= */
+
+            else {
+
+                throw new InvalidVehicleTypeException(
+                        "Invalid Vehicle Type"
+                );
+            }
+
+            /* =========================
+               METHOD OVERRIDING
+            ========================= */
+
+            vehicle.calculateService();
+
+            vehicle.displayDetails();
+
+            totalIncome += vehicle.getCost();
+
+            System.out.println(
+                    "\nBooking Successful"
+            );
+
+        }
+
+        catch (InvalidVehicleTypeException e) {
+
+            System.out.println(
+                    "\nException : " + e.getMessage()
+            );
+        }
+
+        catch (DuplicateBookingException e) {
+
+            System.out.println(
+                    "\nException : " + e.getMessage()
+            );
+        }
+
+        catch (Exception e) {
+
+            System.out.println(
+                    "\nInvalid Input"
+            );
+        }
+
+        /* =========================
+           DISPLAY TOTAL INCOME
+        ========================= */
+
+        System.out.println(
+                "\nTotal Income Today = Rs."
+                        + totalIncome
+        );
+
+        sc.close();
+    }
+}

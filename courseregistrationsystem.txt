@@ -1,0 +1,446 @@
+import java.util.*;
+
+/* =========================
+   CUSTOM EXCEPTIONS
+========================= */
+
+class PrerequisiteNotMetException extends Exception {
+
+    public PrerequisiteNotMetException(String msg) {
+        super(msg);
+    }
+}
+
+class CourseCapacityFullException extends Exception {
+
+    public CourseCapacityFullException(String msg) {
+        super(msg);
+    }
+}
+
+/* =========================
+   STUDENT CLASS
+========================= */
+
+class Student {
+
+    int studentId;
+    String studentName;
+
+    boolean prerequisiteCompleted;
+
+    public Student(int studentId,
+                   String studentName,
+                   boolean prerequisiteCompleted) {
+
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.prerequisiteCompleted =
+                prerequisiteCompleted;
+    }
+
+    public void displayStudent() {
+
+        System.out.println("\nStudent ID   : "
+                + studentId);
+
+        System.out.println("Student Name : "
+                + studentName);
+
+        System.out.println(
+                "Prerequisite Completed : "
+                        + prerequisiteCompleted
+        );
+    }
+}
+
+/* =========================
+   COURSE BASE CLASS
+========================= */
+
+class Course {
+
+    protected int courseId;
+    protected String courseName;
+
+    protected int maxCapacity;
+    protected int enrolledStudents;
+
+    static int totalCourses = 0;
+
+    public Course(int courseId,
+                  String courseName,
+                  int maxCapacity) {
+
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.maxCapacity = maxCapacity;
+
+        enrolledStudents = 0;
+
+        totalCourses++;
+    }
+
+    public void displayCourse() {
+
+        System.out.println("Course ID : "
+                + courseId);
+
+        System.out.println("Course Name : "
+                + courseName);
+
+        System.out.println("Maximum Capacity : "
+                + maxCapacity);
+
+        System.out.println("Enrolled Students : "
+                + enrolledStudents);
+    }
+
+    public void registerStudent(Student student)
+            throws PrerequisiteNotMetException,
+            CourseCapacityFullException {
+
+        /* =========================
+           CHECK PREREQUISITE
+        ========================= */
+
+        if (!student.prerequisiteCompleted) {
+
+            throw new PrerequisiteNotMetException(
+                    "Prerequisite Not Completed"
+            );
+        }
+
+        /* =========================
+           CHECK CAPACITY
+        ========================= */
+
+        if (enrolledStudents >= maxCapacity) {
+
+            throw new CourseCapacityFullException(
+                    "Course Capacity Full"
+            );
+        }
+
+        enrolledStudents++;
+
+        System.out.println(
+                "\nRegistration Successful"
+        );
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public int getEnrolledStudents() {
+        return enrolledStudents;
+    }
+}
+
+/* =========================
+   CORE COURSE
+========================= */
+
+class Core extends Course {
+
+    public Core(int courseId,
+                String courseName,
+                int maxCapacity) {
+
+        super(courseId,
+                courseName,
+                maxCapacity);
+    }
+
+    @Override
+    public void displayCourse() {
+
+        System.out.println(
+                "\n--- Core Course ---"
+        );
+
+        super.displayCourse();
+    }
+}
+
+/* =========================
+   ELECTIVE COURSE
+========================= */
+
+class Elective extends Course {
+
+    public Elective(int courseId,
+                    String courseName,
+                    int maxCapacity) {
+
+        super(courseId,
+                courseName,
+                maxCapacity);
+    }
+
+    @Override
+    public void displayCourse() {
+
+        System.out.println(
+                "\n--- Elective Course ---"
+        );
+
+        super.displayCourse();
+    }
+}
+
+/* =========================
+   AUDIT COURSE
+========================= */
+
+class Audit extends Course {
+
+    public Audit(int courseId,
+                 String courseName,
+                 int maxCapacity) {
+
+        super(courseId,
+                courseName,
+                maxCapacity);
+    }
+
+    @Override
+    public void displayCourse() {
+
+        System.out.println(
+                "\n--- Audit Course ---"
+        );
+
+        super.displayCourse();
+    }
+}
+
+/* =========================
+   REGISTRATION CLASS
+========================= */
+
+class Registration {
+
+    Student student;
+    Course course;
+
+    public Registration(Student student,
+                        Course course) {
+
+        this.student = student;
+        this.course = course;
+    }
+
+    public void processRegistration()
+            throws PrerequisiteNotMetException,
+            CourseCapacityFullException {
+
+        course.registerStudent(student);
+
+        System.out.println(
+                student.studentName
+                        + " registered for "
+                        + course.getCourseName()
+        );
+    }
+}
+
+/* =========================
+   MAIN CLASS
+========================= */
+
+class CourseRegistrationSystem {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+
+            /* =========================
+               STUDENT INPUT
+            ========================= */
+
+            System.out.println(
+                    "Enter Student ID:"
+            );
+
+            int studentId = sc.nextInt();
+            sc.nextLine();
+
+            System.out.println(
+                    "Enter Student Name:"
+            );
+
+            String studentName = sc.nextLine();
+
+            System.out.println(
+                    "Prerequisite Completed? (true/false)"
+            );
+
+            boolean prerequisite =
+                    sc.nextBoolean();
+
+            Student student =
+                    new Student(
+                            studentId,
+                            studentName,
+                            prerequisite
+                    );
+
+            student.displayStudent();
+
+            /* =========================
+               COURSE INPUT
+            ========================= */
+
+            System.out.println(
+                    "\nEnter Course ID:"
+            );
+
+            int courseId = sc.nextInt();
+            sc.nextLine();
+
+            System.out.println(
+                    "Enter Course Name:"
+            );
+
+            String courseName =
+                    sc.nextLine();
+
+            System.out.println(
+                    "Enter Maximum Capacity:"
+            );
+
+            int maxCapacity =
+                    sc.nextInt();
+
+            System.out.println(
+                    "\nChoose Course Type:"
+            );
+
+            System.out.println(
+                    "1.Core\n2.Elective\n3.Audit"
+            );
+
+            int choice = sc.nextInt();
+
+            Course course = null;
+
+            /* =========================
+               INHERITANCE
+            ========================= */
+
+            if (choice == 1) {
+
+                course =
+                        new Core(
+                                courseId,
+                                courseName,
+                                maxCapacity
+                        );
+            }
+
+            else if (choice == 2) {
+
+                course =
+                        new Elective(
+                                courseId,
+                                courseName,
+                                maxCapacity
+                        );
+            }
+
+            else if (choice == 3) {
+
+                course =
+                        new Audit(
+                                courseId,
+                                courseName,
+                                maxCapacity
+                        );
+            }
+
+            else {
+
+                System.out.println(
+                        "Invalid Course Type"
+                );
+
+                System.exit(0);
+            }
+
+            /* =========================
+               DISPLAY COURSE
+            ========================= */
+
+            course.displayCourse();
+
+            /* =========================
+               REGISTRATION
+            ========================= */
+
+            Registration registration =
+                    new Registration(
+                            student,
+                            course
+                    );
+
+            registration.processRegistration();
+
+            /* =========================
+               DISPLAY DETAILS
+            ========================= */
+
+            System.out.println(
+                    "\n===== REGISTRATION DETAILS ====="
+            );
+
+            System.out.println(
+                    "Student : "
+                            + student.studentName
+            );
+
+            System.out.println(
+                    "Course  : "
+                            + course.getCourseName()
+            );
+
+            System.out.println(
+                    "Students Enrolled : "
+                            + course.getEnrolledStudents()
+            );
+
+            System.out.println(
+                    "\nTotal Courses Created : "
+                            + Course.totalCourses
+            );
+        }
+
+        catch (PrerequisiteNotMetException e) {
+
+            System.out.println(
+                    "\nException : "
+                            + e.getMessage()
+            );
+        }
+
+        catch (CourseCapacityFullException e) {
+
+            System.out.println(
+                    "\nException : "
+                            + e.getMessage()
+            );
+        }
+
+        catch (Exception e) {
+
+            System.out.println(
+                    "\nInvalid Input"
+            );
+        }
+
+        sc.close();
+    }
+}

@@ -1,0 +1,53 @@
+import java.util.*;
+
+class Slot {
+    String type;
+    boolean occupied;
+
+    Slot(String type) {
+        this.type = type;
+        this.occupied = false;
+    }
+}
+
+public class Parking {
+
+    static ArrayList<Slot> slots = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void park() {
+        System.out.print("Enter type (2Wheeler/4Wheeler): ");
+        String type = sc.next();
+
+        for (Slot s : slots) {
+            if (s.type.equals(type) && !s.occupied) {
+                s.occupied = true;
+                System.out.println("Parked successfully");
+                return;
+            }
+        }
+        System.out.println("No slot available");
+    }
+
+    static void view() {
+        for (Slot s : slots) {
+            System.out.println(s.type + " | " + (s.occupied ? "Full" : "Free"));
+        }
+    }
+
+    public static void main(String[] args) {
+
+        slots.add(new Slot("2Wheeler"));
+        slots.add(new Slot("4Wheeler"));
+        slots.add(new Slot("4Wheeler"));
+
+        while (true) {
+            System.out.println("\n1.Park 2.View 3.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) park();
+            else if (ch == 2) view();
+            else break;
+        }
+    }
+}

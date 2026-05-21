@@ -1,0 +1,300 @@
+import java.util.*;
+
+// Custom Exception
+class InvalidMedicineTypeException extends Exception {
+
+    public InvalidMedicineTypeException(String message) {
+        super(message);
+    }
+}
+
+// Customer Class
+class Customer {
+
+    private String customerId;
+    private String customerName;
+
+    public Customer(String customerId,
+                    String customerName) {
+
+        this.customerId = customerId;
+        this.customerName = customerName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+}
+
+// Abstract Medicine Class
+abstract class Medicine {
+
+    protected Customer customer;
+    protected String medicineName;
+    protected int quantity;
+    protected double totalBill;
+
+    protected static double totalSales = 0;
+
+    public Medicine(Customer customer,
+                    String medicineName,
+                    int quantity) {
+
+        this.customer = customer;
+        this.medicineName = medicineName;
+        this.quantity = quantity;
+    }
+
+    public abstract void calculateBill();
+
+    public double getTotalBill() {
+        return totalBill;
+    }
+
+    public static double getTotalSales() {
+        return totalSales;
+    }
+
+    public void displayDetails() {
+
+        System.out.println(
+                "Customer: " + customer.getCustomerName()
+                        + ", Medicine: " + medicineName
+                        + ", Quantity: " + quantity
+                        + ", Bill: ₹" + totalBill
+        );
+    }
+}
+
+// Tablet Medicine
+class TabletMedicine extends Medicine {
+
+    public TabletMedicine(Customer customer,
+                          String medicineName,
+                          int quantity) {
+
+        super(customer, medicineName, quantity);
+
+        calculateBill();
+    }
+
+    @Override
+    public void calculateBill() {
+
+        // ₹20 per tablet
+        totalBill = quantity * 20;
+
+        totalSales += totalBill;
+    }
+}
+
+// Syrup Medicine
+class SyrupMedicine extends Medicine {
+
+    public SyrupMedicine(Customer customer,
+                         String medicineName,
+                         int quantity) {
+
+        super(customer, medicineName, quantity);
+
+        calculateBill();
+    }
+
+    @Override
+    public void calculateBill() {
+
+        // ₹80 per bottle + 5% GST
+        totalBill =
+                (quantity * 80)
+                        + ((quantity * 80) * 0.05);
+
+        totalSales += totalBill;
+    }
+}
+
+// Injection Medicine
+class InjectionMedicine extends Medicine {
+
+    public InjectionMedicine(Customer customer,
+                             String medicineName,
+                             int quantity) {
+
+        super(customer, medicineName, quantity);
+
+        calculateBill();
+    }
+
+    @Override
+    public void calculateBill() {
+
+        // ₹150 per injection + handling charge
+        totalBill =
+                (quantity * 150)
+                        + ((quantity * 150) * 0.10);
+
+        totalSales += totalBill;
+    }
+}
+
+// Main Class
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        ArrayList<Medicine> medicines =
+                new ArrayList<>();
+
+        System.out.print(
+                "Enter number of medicine records: "
+        );
+
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        for (int i = 0; i < n; i++) {
+
+            try {
+
+                System.out.println(
+                        "\n===== ENTER MEDICINE DETAILS ====="
+                );
+
+                // Customer ID
+                System.out.print(
+                        "Enter Customer ID: "
+                );
+
+                String id = sc.nextLine();
+
+                // Customer Name
+                System.out.print(
+                        "Enter Customer Name: "
+                );
+
+                String name = sc.nextLine();
+
+                Customer customer =
+                        new Customer(id, name);
+
+                // Medicine Type
+                System.out.print(
+                        "Enter Medicine Type(Tablet/Syrup/Injection): "
+                );
+
+                String type = sc.nextLine();
+
+                // Medicine Name
+                System.out.print(
+                        "Enter Medicine Name: "
+                );
+
+                String medicineName = sc.nextLine();
+
+                // Quantity
+                System.out.print(
+                        "Enter Quantity: "
+                );
+
+                int quantity = sc.nextInt();
+                sc.nextLine();
+
+                // Invalid Quantity
+                if (quantity <= 0) {
+
+                    System.out.println(
+                            "Error: Invalid quantity; record not added"
+                    );
+
+                    continue;
+                }
+
+                Medicine medicine = null;
+
+                // Tablet
+                if (type.equalsIgnoreCase("Tablet")) {
+
+                    medicine = new TabletMedicine(
+                            customer,
+                            medicineName,
+                            quantity
+                    );
+                }
+
+                // Syrup
+                else if (type.equalsIgnoreCase("Syrup")) {
+
+                    medicine = new SyrupMedicine(
+                            customer,
+                            medicineName,
+                            quantity
+                    );
+                }
+
+                // Injection
+                else if (type.equalsIgnoreCase("Injection")) {
+
+                    medicine = new InjectionMedicine(
+                            customer,
+                            medicineName,
+                            quantity
+                    );
+                }
+
+                else {
+
+                    throw new InvalidMedicineTypeException(
+                            "Invalid Medicine Type!"
+                    );
+                }
+
+                medicines.add(medicine);
+
+                System.out.println(
+                        "\nMedicine Record Added Successfully."
+                );
+
+                System.out.println(
+                        "Bill Amount: ₹"
+                                + medicine.getTotalBill()
+                );
+
+            } catch (InvalidMedicineTypeException e) {
+
+                System.out.println(
+                        "Exception: " + e.getMessage()
+                );
+
+            } catch (Exception e) {
+
+                System.out.println(
+                        "Error occurred while processing input!"
+                );
+            }
+        }
+
+        // Medicines Above ₹1000
+        System.out.println(
+                "\n===== MEDICINES ABOVE ₹1000 ====="
+        );
+
+        for (Medicine m : medicines) {
+
+            if (m.getTotalBill() > 1000) {
+
+                m.displayDetails();
+            }
+        }
+
+        // Total Sales
+        System.out.println(
+                "\nTotal Pharmacy Sales: ₹"
+                        + Medicine.getTotalSales()
+        );
+    }
+}

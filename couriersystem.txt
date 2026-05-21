@@ -1,0 +1,63 @@
+import java.util.*;
+
+class Parcel {
+    String id;
+    String name;
+    int weight;
+    int cost;
+
+    Parcel(String id, String name, int weight) {
+        this.id = id;
+        this.name = name;
+        this.weight = weight;
+    }
+
+    void calculate() {
+        if (weight <= 5) cost = 100;
+        else cost = 100 + (weight * 20);
+    }
+}
+
+public class Courier {
+
+    static ArrayList<Parcel> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void add() {
+        String id = "P" + (list.size() + 1);
+
+        System.out.print("Name: ");
+        String name = sc.next();
+
+        System.out.print("Weight: ");
+        int w = sc.nextInt();
+
+        if (w <= 0) {
+            System.out.println("Invalid weight");
+            return;
+        }
+
+        Parcel p = new Parcel(id, name, w);
+        p.calculate();
+        list.add(p);
+
+        System.out.println("Added cost: " + p.cost);
+    }
+
+    static void view() {
+        for (Parcel p : list) {
+            System.out.println(p.id + " | " + p.name + " | " + p.weight + " | " + p.cost);
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1.Add 2.View 3.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) add();
+            else if (ch == 2) view();
+            else break;
+        }
+    }
+}

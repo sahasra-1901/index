@@ -1,0 +1,215 @@
+package villa;
+
+public class InvalidMaterialException extends Exception {
+    public InvalidMaterialException(String message) {
+        super(message);
+    }
+}
+public class Client {
+    private String name;
+    private String contact;
+    public Client(String name, String contact) {
+        this.name = name;
+        this.contact = contact;
+    }
+    public String getName() { return name; }
+    public String getContact() { return contact; }
+}
+abstract class Villa {
+    protected Client client;
+    protected String villaType;
+    protected double area;
+    protected String material;
+    protected String architect;
+    protected double cost;
+    protected static double totalCost = 0;
+    public Villa(Client client,
+                 double area,
+                 String material,
+                 String architect,
+                 String villaType)
+            throws InvalidMaterialException {
+        if(area <= 0)
+            throw new IllegalArgumentException("Invalid area");
+        if(!(material.equalsIgnoreCase("Standard")
+                || material.equalsIgnoreCase("Premium")))
+            throw new InvalidMaterialException(
+                    "Material must be Standard or Premium");
+        if(architect == null || architect.trim().isEmpty())
+            architect = "Default Architect";
+        this.client = client;
+        this.area = area;
+        this.material = material;
+        this.architect = architect;
+        this.villaType = villaType;
+    }
+    public abstract void calculateCost();
+    public double getCost() { return cost; }
+    public static double getTotalProfit() {
+        return totalCost * 0.15;
+    }
+    public static void displayTotalProfit() {
+        System.out.println("Total Daily Profit: ₹" + getTotalProfit());
+    }
+    public void displayDetails() {
+        System.out.println(
+            "Client: " + client.getName()
+            + ", Type: " + villaType
+            + ", Area: " + area
+            + ", Material: " + material
+            + ", Architect: " + architect
+            + ", Cost: ₹" + cost
+        );
+    }
+}
+public class LuxuryVilla extends Villa {
+    private boolean hasGarden;
+    private int floors;
+    public LuxuryVilla(Client client,
+                       double area,
+                       String material,
+                       String architect,
+                       boolean hasGarden,
+                       int floors)
+            throws InvalidMaterialException {
+        super(client, area, material, architect, "LuxuryVilla");
+        this.hasGarden = hasGarden;
+        this.floors = floors;
+        calculateCost();
+    }
+    @Override
+    public void calculateCost() {
+        double baseRate =
+                material.equalsIgnoreCase("Premium") ? 2500 : 2000;
+        cost = baseRate * area
+                + (hasGarden ? 50000 : 0)
+                + (floors * 40000);
+        totalCost += cost;
+    }
+}
+public class EcoVilla extends Villa {
+    private boolean solarPanels;
+    public EcoVilla(Client client,
+                    double area,
+                    String material,
+                    String architect,
+                    boolean solarPanels)
+            throws InvalidMaterialException {
+        super(client, area, material, architect, "EcoVilla");
+        this.solarPanels = solarPanels;
+        calculateCost();
+    }
+    @Override
+    public void calculateCost() {
+        double baseRate =
+                material.equalsIgnoreCase("Premium") ? 1800 : 1500;
+        cost = baseRate * area
+                + (solarPanels ? 100000 : 0);
+        totalCost += cost;
+    }
+}
+public class CompactVilla extends Villa {
+    private boolean hasParking;
+    public CompactVilla(Client client,
+                        double area,
+                        String material,
+                        String architect,
+                        boolean hasParking)
+            throws InvalidMaterialException {
+        super(client, area, material, architect, "CompactVilla");
+        this.hasParking = hasParking;
+        calculateCost();
+    }
+    @Override
+    public void calculateCost() {
+        double baseRate =
+                material.equalsIgnoreCase("Premium") ? 1200 : 1000;
+
+        cost = baseRate * area
+                + (hasParking ? 30000 : 0);
+
+        totalCost += cost;
+    }
+}
+
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Villa> villas = new ArrayList<>();
+        System.out.print("Enter number of villa records: ");
+        int n = sc.nextInt();
+        sc.nextLine(); // clear buffer
+        for(int i=1;i<=n;i++) {
+            try {
+                System.out.println("\n--- Enter Villa "+i+" Details ---");
+                System.out.print("Client Name: ");
+                String name = sc.nextLine();
+                System.out.print("Contact: ");
+                String contact = sc.nextLine();
+                Client client = new Client(name, contact);
+                System.out.print("Villa Type (Luxury/Eco/Compact): ");
+                String type = sc.nextLine();
+                System.out.print("Area: ");
+                double area = sc.nextDouble();
+                sc.nextLine();
+                System.out.print("Material (Standard/Premium): ");
+                String material = sc.nextLine();
+                System.out.print("Architect Name: ");
+                String architect = sc.nextLine();
+                Villa villa = null;
+                // ---------- TYPE SELECTION ----------
+                if(type.equalsIgnoreCase("Luxury")) {
+                    System.out.print("Has Garden (true/false): ");
+                    boolean garden = sc.nextBoolean();
+                    System.out.print("Number of Floors: ");
+                    int floors = sc.nextInt();
+                    sc.nextLine();
+                    villa = new LuxuryVilla(  client, area, material,architect, garden, floors);
+                }
+                else if(type.equalsIgnoreCase("Eco")) {
+                    System.out.print("Solar Panels (true/false): ");
+                    boolean solar = sc.nextBoolean();
+                    sc.nextLine();
+                    villa = new EcoVilla( client, area, material,architect, solar);
+                }
+                else if(type.equalsIgnoreCase("Compact")) {
+                    System.out.print("Parking Available (true/false): ");
+                    boolean parking = sc.nextBoolean();
+                    sc.nextLine();
+                    villa = new CompactVilla(   client, area, material,architect, parking);
+                }
+                else {
+                    System.out.println("Invalid villa type!");
+                    i--;
+                    continue;
+                }
+                villas.add(villa);
+                System.out.println("Record added successfully.");
+                System.out.println(
+                        "Cost: ₹" + villa.getCost()
+                        + ", Profit: ₹" + (villa.getCost()*0.15)
+                );
+            }
+            catch(Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                i--; // retry same record
+            }
+        }
+        // ---------- DISPLAY ALL ----------
+        System.out.println("\n--- Villa Records ---");
+        for(Villa v : villas)
+            v.displayDetails();
+
+        // ---------- TOTAL PROFIT ----------
+        Villa.displayTotalProfit();
+
+        // ---------- TC8 FILTER ----------
+        System.out.println("\nVillas above ₹30 Lakhs:");
+        for(Villa v : villas) {
+            if(v.getCost() > 3000000)
+                v.displayDetails();
+        }
+        sc.close();
+    }
+}

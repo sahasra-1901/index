@@ -1,0 +1,61 @@
+import java.util.*;
+
+class Employee {
+    String id;
+    String name;
+    String role;
+    int salary;
+
+    Employee(String id, String name, String role) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+    }
+
+    void calculate() {
+        if (role.equals("Manager")) salary = 50000;
+        else if (role.equals("Developer")) salary = 30000;
+        else salary = 15000;
+
+        if (salary > 40000) salary -= salary * 0.1;
+    }
+}
+
+public class Payroll {
+
+    static ArrayList<Employee> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void add() {
+        String id = "E" + (list.size() + 1);
+
+        System.out.print("Name: ");
+        String name = sc.next();
+
+        System.out.print("Role: ");
+        String role = sc.next();
+
+        Employee e = new Employee(id, name, role);
+        e.calculate();
+        list.add(e);
+
+        System.out.println("Salary: " + e.salary);
+    }
+
+    static void view() {
+        for (Employee e : list) {
+            System.out.println(e.id + " | " + e.name + " | " + e.role + " | " + e.salary);
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1.Add 2.View 3.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) add();
+            else if (ch == 2) view();
+            else break;
+        }
+    }
+}

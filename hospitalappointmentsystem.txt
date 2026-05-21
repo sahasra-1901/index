@@ -1,0 +1,59 @@
+import java.util.*;
+
+class Appointment {
+    String id;
+    String patient;
+    String doctorType;
+    int fee;
+
+    Appointment(String id, String patient, String doctorType) {
+        this.id = id;
+        this.patient = patient;
+        this.doctorType = doctorType;
+    }
+
+    void calculate() {
+        if (doctorType.equals("General")) fee = 200;
+        else if (doctorType.equals("Specialist")) fee = 500;
+        else fee = 1000;
+    }
+}
+
+public class Hospital {
+
+    static ArrayList<Appointment> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void book() {
+        String id = "A" + (list.size() + 1);
+
+        System.out.print("Patient: ");
+        String name = sc.next();
+
+        System.out.print("Doctor type: ");
+        String type = sc.next();
+
+        Appointment a = new Appointment(id, name, type);
+        a.calculate();
+        list.add(a);
+
+        System.out.println("Booked ID: " + id + " Fee: " + a.fee);
+    }
+
+    static void view() {
+        for (Appointment a : list) {
+            System.out.println(a.id + " | " + a.patient + " | " + a.doctorType + " | " + a.fee);
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1.Book 2.View 3.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) book();
+            else if (ch == 2) view();
+            else break;
+        }
+    }
+}

@@ -1,0 +1,75 @@
+import java.util.*;
+
+class Account {
+    String name;
+    int balance;
+
+    Account(String name, int balance) {
+        this.name = name;
+        this.balance = balance;
+    }
+
+    void deposit(int amt) {
+        balance += amt;
+    }
+
+    void withdraw(int amt) {
+        if (amt > balance) {
+            System.out.println("Insufficient Balance");
+        } else {
+            balance -= amt;
+        }
+    }
+}
+
+public class Bank {
+
+    static ArrayList<Account> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static Account find(String name) {
+        for (Account a : list) {
+            if (a.name.equals(name)) return a;
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+
+        list.add(new Account("Asha", 1000));
+
+        while (true) {
+            System.out.println("\n1.Deposit 2.Withdraw 3.View 4.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) {
+                System.out.print("Name: ");
+                String n = sc.next();
+                Account a = find(n);
+
+                if (a != null) {
+                    System.out.print("Amount: ");
+                    a.deposit(sc.nextInt());
+                }
+            }
+
+            else if (ch == 2) {
+                System.out.print("Name: ");
+                String n = sc.next();
+                Account a = find(n);
+
+                if (a != null) {
+                    System.out.print("Amount: ");
+                    a.withdraw(sc.nextInt());
+                }
+            }
+
+            else if (ch == 3) {
+                for (Account a : list)
+                    System.out.println(a.name + " | " + a.balance);
+            }
+
+            else break;
+        }
+    }
+}

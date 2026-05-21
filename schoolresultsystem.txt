@@ -1,0 +1,70 @@
+import java.util.*;
+
+class Student {
+    String name;
+    int marks[] = new int[5];
+    int total;
+    double avg;
+
+    Student(String name, int marks[]) {
+        this.name = name;
+        this.marks = marks;
+    }
+
+    void calculate() {
+        for (int m : marks) {
+            if (m < 0 || m > 100) {
+                System.out.println("Invalid marks for " + name);
+                return;
+            }
+            total += m;
+        }
+        avg = total / 5.0;
+    }
+
+    String grade() {
+        if (avg >= 90) return "A";
+        else if (avg >= 75) return "B";
+        else if (avg >= 50) return "C";
+        else return "Fail";
+    }
+}
+
+public class ResultSystem {
+
+    static ArrayList<Student> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void addStudent() {
+        System.out.print("Name: ");
+        String name = sc.next();
+
+        int marks[] = new int[5];
+        System.out.println("Enter 5 marks:");
+
+        for (int i = 0; i < 5; i++) {
+            marks[i] = sc.nextInt();
+        }
+
+        Student s = new Student(name, marks);
+        s.calculate();
+        list.add(s);
+    }
+
+    static void view() {
+        for (Student s : list) {
+            System.out.println(s.name + " | Total: " + s.total + " | Avg: " + s.avg + " | Grade: " + s.grade());
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1.Add 2.View 3.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) addStudent();
+            else if (ch == 2) view();
+            else break;
+        }
+    }
+}

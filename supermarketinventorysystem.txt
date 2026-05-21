@@ -1,0 +1,75 @@
+import java.util.*;
+
+class Product {
+    String name;
+    int price;
+    int qty;
+
+    Product(String name, int price, int qty) {
+        this.name = name;
+        this.price = price;
+        this.qty = qty;
+    }
+}
+
+public class Supermarket {
+
+    static ArrayList<Product> list = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void addProduct() {
+        System.out.print("Name: ");
+        String name = sc.next();
+
+        System.out.print("Price: ");
+        int price = sc.nextInt();
+
+        System.out.print("Qty: ");
+        int qty = sc.nextInt();
+
+        list.add(new Product(name, price, qty));
+    }
+
+    static void buy() {
+        System.out.print("Enter product name: ");
+        String name = sc.next();
+
+        System.out.print("Qty: ");
+        int qty = sc.nextInt();
+
+        for (Product p : list) {
+            if (p.name.equals(name)) {
+                if (p.qty >= qty) {
+                    p.qty -= qty;
+                    int bill = p.price * qty;
+
+                    if (bill > 2000) bill -= bill * 0.1;
+
+                    System.out.println("Bill: " + bill);
+                } else {
+                    System.out.println("Out of stock");
+                }
+                return;
+            }
+        }
+        System.out.println("Not found");
+    }
+
+    static void view() {
+        for (Product p : list) {
+            System.out.println(p.name + " | " + p.price + " | " + p.qty);
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1.Add 2.Buy 3.View 4.Exit");
+            int ch = sc.nextInt();
+
+            if (ch == 1) addProduct();
+            else if (ch == 2) buy();
+            else if (ch == 3) view();
+            else break;
+        }
+    }
+}

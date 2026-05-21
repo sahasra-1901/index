@@ -1,0 +1,151 @@
+import java.util.Scanner;
+
+abstract class Tile {
+
+    protected String tileType;
+    protected double basePricePerSqFt;
+    protected double stockAvailable;
+
+    public Tile(String tileType, double basePricePerSqFt, double stockAvailable) {
+        this.tileType = tileType;
+        this.basePricePerSqFt = basePricePerSqFt;
+        this.stockAvailable = stockAvailable;
+    }
+
+    public double getSellingPricePerSqFt() {
+        return basePricePerSqFt + (0.20 * basePricePerSqFt);
+    }
+
+    public double calculateProfit(double area) {
+        double markup = 0.20 * basePricePerSqFt;
+        return markup * area;
+    }
+
+    public void reduceStock(double area) throws Exception {
+        if(area > stockAvailable) {
+            throw new Exception("Insufficient stock for " + tileType);
+        }
+        stockAvailable -= area;
+    }
+    public abstract void displayTileInfo();
+}
+
+
+class CeramicTile extends Tile {
+    private String finish;
+    public CeramicTile(double price, double stock, String finish) {
+        super("Ceramic", price, stock);
+        this.finish = finish;
+    }
+
+    @Override
+    public void displayTileInfo() {
+        System.out.println("\n----- Ceramic Tile Info -----");
+        System.out.println("Tile Type : " + tileType);
+        System.out.println("Finish    : " + finish);
+        System.out.println("Base Price: Rs." + basePricePerSqFt);
+        System.out.println("Stock     : " + stockAvailable + " sq.ft");
+    }
+}
+
+class VitrifiedTile extends Tile {
+    private int durabilityRating;
+    public VitrifiedTile(double price, double stock, int durabilityRating) {
+        super("Vitrified", price, stock);
+        this.durabilityRating = durabilityRating;
+    }
+
+    @Override
+    public void displayTileInfo() {
+        System.out.println("\n----- Vitrified Tile Info -----");
+        System.out.println("Tile Type         : " + tileType);
+        System.out.println("Durability Rating : " + durabilityRating + "/10");
+        System.out.println("Base Price        : Rs." + basePricePerSqFt);
+        System.out.println("Stock             : " + stockAvailable + " sq.ft");
+    }
+}
+
+class MarbleTile extends Tile {
+    private String applicationArea;
+    public MarbleTile(double price, double stock, String applicationArea) {
+        super("Marble", price, stock);
+        this.applicationArea = applicationArea;
+    }
+
+    @Override
+    public void displayTileInfo() {
+        System.out.println("\n----- Marble Tile Info -----");
+        System.out.println("Tile Type       : " + tileType);
+        System.out.println("Application Area: " + applicationArea);
+        System.out.println("Base Price      : Rs." + basePricePerSqFt);
+        System.out.println("Stock           : " + stockAvailable + " sq.ft");
+    }
+}
+
+class TilePurchaseProcessor {
+    public static void processPurchase(Tile tile, double area) throws Exception {
+        if(area > 500) {
+            System.out.println("\nWarning: Large order detected!");
+        }
+        tile.reduceStock(area);
+        double sellingPrice = tile.getSellingPricePerSqFt();
+        double totalCost = sellingPrice * area;
+        double profit = tile.calculateProfit(area);
+
+        System.out.println("\nPurchase Processed Successfully!");
+        System.out.println("Area Purchased : " + area + " sq.ft");
+        System.out.println("Selling Price  : Rs." + sellingPrice + " per sq.ft");
+        System.out.println("Total Cost     : Rs." + totalCost);
+        System.out.println("Profit for Day : Rs." + profit);
+        System.out.println("Remaining Stock: " + tile.stockAvailable + " sq.ft");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Tile tile = null;
+
+        try {
+            System.out.println("===== TILE SHOWROOM MANAGEMENT SYSTEM =====");
+            System.out.print("\nEnter Your Choice: ");
+            STring choice = sc.next();
+            System.out.print("Enter Base Price per sq.ft: ");
+            double price = sc.nextDouble();
+            System.out.print("Enter Available Stock (sq.ft): ");
+            double stock = sc.nextDouble();
+            sc.nextLine();
+
+            switch(choice) {
+                case "Ceramic":
+                    System.out.print("Enter Finish Type: ");
+                    String finish = sc.nextLine();
+                    tile = new CeramicTile(price, stock, finish);
+                    break;
+                case "Vitrified":
+                    System.out.print("Enter Durability Rating: ");
+                    int rating = sc.nextInt();
+                    tile = new VitrifiedTile(price, stock, rating);
+                    break;
+                case "Marble":
+                    System.out.print("Enter Application Area: ");
+                    String applicationArea = sc.nextLine();
+                    tile = new MarbleTile(price, stock, applicationArea);
+                    break;
+                default:
+                    throw new Exception("Title type not available");
+            }
+
+            tile.displayTileInfo();
+            System.out.print("\nEnter Area to Purchase (sq.ft): ");
+            double area = sc.nextDouble();
+            TilePurchaseProcessor.processPurchase(tile, area);
+        }
+        catch(Exception e) {
+            System.out.println("\nError: " + e.getMessage());
+        }
+        finally {
+            sc.close();
+        }
+    }
+}

@@ -1,0 +1,110 @@
+import java.util.*;
+class Ticket {
+    String name;
+    String seatType;
+    int price;
+    String bookingId;
+
+    Ticket(String name, String seatType, String bookingId) {
+        this.name = name;
+        this.seatType = seatType;
+        this.bookingId = bookingId;
+    }
+
+    void calculatePrice() {
+        if (seatType.equals("Normal")) price = 150;
+        else if (seatType.equals("Premium")) price = 250;
+        else if (seatType.equals("Recliner")) price = 400;
+    }
+}
+
+public class MovieSystem {
+
+    static ArrayList<Ticket> bookings = new ArrayList<>();
+    static int normalSeats = 5;
+    static int premiumSeats = 5;
+    static int reclinerSeats = 5;
+
+    static Scanner sc = new Scanner(System.in);
+
+    // BOOK TICKET
+    static void bookTicket() {
+        System.out.print("Enter name: ");
+        String name = sc.next();
+
+        System.out.print("Seat type (Normal/Premium/Recliner): ");
+        String type = sc.next();
+
+        if (type.equals("Normal") && normalSeats == 0 ||
+            type.equals("Premium") && premiumSeats == 0 ||
+            type.equals("Recliner") && reclinerSeats == 0) {
+            System.out.println("Seats not available!");
+            return;
+        }
+
+        String id = "B" + (bookings.size() + 1);
+        Ticket t = new Ticket(name, type, id);
+        t.calculatePrice();
+
+        bookings.add(t);
+
+        if (type.equals("Normal")) normalSeats--;
+        else if (type.equals("Premium")) premiumSeats--;
+        else reclinerSeats--;
+
+        System.out.println("Booked Successfully! ID: " + id + " Price: " + t.price);
+    }
+
+    // VIEW BOOKINGS
+    static void viewBookings() {
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings yet");
+            return;
+        }
+
+        for (Ticket t : bookings) {
+            System.out.println(t.bookingId + " | " + t.name + " | " + t.seatType + " | " + t.price);
+        }
+    }
+
+    // CANCEL BOOKING
+    static void cancelTicket() {
+        System.out.print("Enter booking ID: ");
+        String id = sc.next();
+
+        for (int i = 0; i < bookings.size(); i++) {
+            Ticket t = bookings.get(i);
+
+            if (t.bookingId.equals(id)) {
+
+                // refund 80%
+                int refund = (t.price * 80) / 100;
+
+                if (t.seatType.equals("Normal")) normalSeats++;
+                else if (t.seatType.equals("Premium")) premiumSeats++;
+                else reclinerSeats++;
+
+                bookings.remove(i);
+
+                System.out.println("Cancelled! Refund: " + refund);
+                return;
+            }
+        }
+
+        System.out.println("Invalid Booking ID");
+    }
+
+    // MENU
+    public static void main(String[] args) {
+
+        while (true) {
+            System.out.println("\n1.Book 2.View 3.Cancel 4.Exit");
+            int choice = sc.nextInt();
+
+            if (choice == 1) bookTicket();
+            else if (choice == 2) viewBookings();
+            else if (choice == 3) cancelTicket();
+            else break;
+        }
+    }
+}

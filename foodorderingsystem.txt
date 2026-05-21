@@ -1,0 +1,427 @@
+import java.util.*;
+
+/* =========================
+   CUSTOM EXCEPTIONS
+========================= */
+
+class ItemUnavailableException extends Exception {
+
+    public ItemUnavailableException(String msg) {
+        super(msg);
+    }
+}
+
+class InvalidQuantityException extends Exception {
+
+    public InvalidQuantityException(String msg) {
+        super(msg);
+    }
+}
+
+/* =========================
+   FOOD ITEM BASE CLASS
+========================= */
+
+class FoodItem {
+
+    protected int itemId;
+    protected String itemName;
+    protected double price;
+    protected boolean available;
+
+    public FoodItem(int itemId,
+                    String itemName,
+                    double price,
+                    boolean available) {
+
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.price = price;
+        this.available = available;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void displayItem() {
+
+        System.out.println("Item ID    : " + itemId);
+        System.out.println("Item Name  : " + itemName);
+        System.out.println("Price      : Rs." + price);
+        System.out.println("Available  : " + available);
+    }
+}
+
+/* =========================
+   MAIN COURSE CLASS
+========================= */
+
+class MainCourse extends FoodItem {
+
+    public MainCourse(int itemId,
+                      String itemName,
+                      double price,
+                      boolean available) {
+
+        super(itemId,
+                itemName,
+                price,
+                available);
+    }
+
+    @Override
+    public void displayItem() {
+
+        System.out.println("\n--- Main Course ---");
+
+        super.displayItem();
+    }
+}
+
+/* =========================
+   DESSERT CLASS
+========================= */
+
+class Dessert extends FoodItem {
+
+    public Dessert(int itemId,
+                   String itemName,
+                   double price,
+                   boolean available) {
+
+        super(itemId,
+                itemName,
+                price,
+                available);
+    }
+
+    @Override
+    public void displayItem() {
+
+        System.out.println("\n--- Dessert ---");
+
+        super.displayItem();
+    }
+}
+
+/* =========================
+   BEVERAGE CLASS
+========================= */
+
+class Beverage extends FoodItem {
+
+    public Beverage(int itemId,
+                    String itemName,
+                    double price,
+                    boolean available) {
+
+        super(itemId,
+                itemName,
+                price,
+                available);
+    }
+
+    @Override
+    public void displayItem() {
+
+        System.out.println("\n--- Beverage ---");
+
+        super.displayItem();
+    }
+}
+
+/* =========================
+   CUSTOMER CLASS
+========================= */
+
+class Customer {
+
+    int customerId;
+    String customerName;
+
+    public Customer(int customerId,
+                    String customerName) {
+
+        this.customerId = customerId;
+        this.customerName = customerName;
+    }
+
+    public void displayCustomer() {
+
+        System.out.println("\nCustomer ID   : "
+                + customerId);
+
+        System.out.println("Customer Name : "
+                + customerName);
+    }
+}
+
+/* =========================
+   ORDER CLASS
+========================= */
+
+class Order {
+
+    FoodItem item;
+    Customer customer;
+
+    int quantity;
+
+    static double dailySales = 0;
+
+    public Order(FoodItem item,
+                 Customer customer,
+                 int quantity) {
+
+        this.item = item;
+        this.customer = customer;
+        this.quantity = quantity;
+    }
+
+    public void placeOrder()
+            throws ItemUnavailableException,
+            InvalidQuantityException {
+
+        /* =========================
+           CHECK AVAILABILITY
+        ========================= */
+
+        if (!item.isAvailable()) {
+
+            throw new ItemUnavailableException(
+                    "Food Item Not Available"
+            );
+        }
+
+        /* =========================
+           CHECK QUANTITY
+        ========================= */
+
+        if (quantity <= 0) {
+
+            throw new InvalidQuantityException(
+                    "Invalid Quantity"
+            );
+        }
+
+        /* =========================
+           BILL CALCULATION
+        ========================= */
+
+        double subtotal =
+                item.getPrice() * quantity;
+
+        double gst =
+                subtotal * 0.05;
+
+        double serviceCharge =
+                subtotal * 0.10;
+
+        double totalBill =
+                subtotal + gst + serviceCharge;
+
+        dailySales += totalBill;
+
+        /* =========================
+           DISPLAY BILL
+        ========================= */
+
+        System.out.println("\nOrder Placed Successfully");
+
+        System.out.println("Food Item : "
+                + item.getItemName());
+
+        System.out.println("Quantity  : "
+                + quantity);
+
+        System.out.println("Subtotal  : Rs."
+                + subtotal);
+
+        System.out.println("GST (5%)  : Rs."
+                + gst);
+
+        System.out.println("Service Charge (10%) : Rs."
+                + serviceCharge);
+
+        System.out.println("Total Bill : Rs."
+                + totalBill);
+    }
+}
+
+/* =========================
+   MAIN CLASS
+========================= */
+
+ class OnlineFoodOrderingSystem {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+
+            /* =========================
+               CUSTOMER INPUT
+            ========================= */
+
+            System.out.println("Enter Customer ID:");
+            int customerId = sc.nextInt();
+            sc.nextLine();
+
+            System.out.println("Enter Customer Name:");
+            String customerName = sc.nextLine();
+
+            Customer customer =
+                    new Customer(
+                            customerId,
+                            customerName
+                    );
+
+            customer.displayCustomer();
+
+            /* =========================
+               FOOD ITEM INPUT
+            ========================= */
+
+            System.out.println("\nEnter Food Item ID:");
+            int itemId = sc.nextInt();
+            sc.nextLine();
+
+            System.out.println("Enter Food Item Name:");
+            String itemName = sc.nextLine();
+
+            System.out.println("Enter Price:");
+            double price = sc.nextDouble();
+
+            System.out.println(
+                    "Is Item Available? (true/false)"
+            );
+
+            boolean available = sc.nextBoolean();
+
+            System.out.println(
+                    "\nChoose Food Category:"
+            );
+
+            System.out.println(
+                    "1.Main Course\n2.Dessert\n3.Beverage"
+            );
+
+            int choice = sc.nextInt();
+
+            FoodItem item = null;
+
+            /* =========================
+               INHERITANCE
+            ========================= */
+
+            if (choice == 1) {
+
+                item = new MainCourse(
+                        itemId,
+                        itemName,
+                        price,
+                        available
+                );
+            }
+
+            else if (choice == 2) {
+
+                item = new Dessert(
+                        itemId,
+                        itemName,
+                        price,
+                        available
+                );
+            }
+
+            else if (choice == 3) {
+
+                item = new Beverage(
+                        itemId,
+                        itemName,
+                        price,
+                        available
+                );
+            }
+
+            else {
+
+                System.out.println(
+                        "\nInvalid Category"
+                );
+
+                System.exit(0);
+            }
+
+            /* =========================
+               METHOD OVERRIDING
+            ========================= */
+
+            item.displayItem();
+
+            /* =========================
+               ORDER INPUT
+            ========================= */
+
+            System.out.println(
+                    "\nEnter Quantity:"
+            );
+
+            int quantity = sc.nextInt();
+
+            Order order =
+                    new Order(
+                            item,
+                            customer,
+                            quantity
+                    );
+
+            order.placeOrder();
+
+        }
+
+        catch (ItemUnavailableException e) {
+
+            System.out.println(
+                    "\nException : "
+                            + e.getMessage()
+            );
+        }
+
+        catch (InvalidQuantityException e) {
+
+            System.out.println(
+                    "\nException : "
+                            + e.getMessage()
+            );
+        }
+
+        catch (Exception e) {
+
+            System.out.println(
+                    "\nInvalid Input"
+            );
+        }
+
+        /* =========================
+           DAILY SALES
+        ========================= */
+
+        System.out.println(
+                "\nDaily Sales Total = Rs."
+                        + Order.dailySales
+        );
+
+        sc.close();
+    }
+}

@@ -1,0 +1,354 @@
+import java.util.*;
+
+/* =========================
+   CUSTOM EXCEPTIONS
+========================= */
+
+class BookNotAvailableException extends Exception {
+    public BookNotAvailableException(String msg) {
+        super(msg);
+    }
+}
+
+class BorrowLimitExceededException extends Exception {
+    public BorrowLimitExceededException(String msg) {
+        super(msg);
+    }
+}
+
+class OverdueReturnException extends Exception {
+    public OverdueReturnException(String msg) {
+        super(msg);
+    }
+}
+
+/* =========================
+   BOOK CLASS
+========================= */
+
+class Book {
+
+    protected int bookId;
+    protected String title;
+    protected String author;
+    protected boolean available;
+
+    public Book(int bookId, String title, String author) {
+        this.bookId = bookId;
+        this.title = title;
+        this.author = author;
+        this.available = true;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void displayBook() {
+
+        System.out.println("Book ID : " + bookId);
+        System.out.println("Title   : " + title);
+        System.out.println("Author  : " + author);
+        System.out.println("Available : " + available);
+    }
+}
+
+/* =========================
+   INHERITANCE
+========================= */
+
+class ReferenceBook extends Book {
+
+    public ReferenceBook(int bookId, String title, String author) {
+        super(bookId, title, author);
+    }
+
+    @Override
+    public void displayBook() {
+        System.out.println("\n--- Reference Book ---");
+        super.displayBook();
+    }
+}
+
+class TextBook extends Book {
+
+    public TextBook(int bookId, String title, String author) {
+        super(bookId, title, author);
+    }
+
+    @Override
+    public void displayBook() {
+        System.out.println("\n--- Text Book ---");
+        super.displayBook();
+    }
+}
+
+class Journal extends Book {
+
+    public Journal(int bookId, String title, String author) {
+        super(bookId, title, author);
+    }
+
+    @Override
+    public void displayBook() {
+        System.out.println("\n--- Journal ---");
+        super.displayBook();
+    }
+}
+
+/* =========================
+   MEMBER CLASS
+========================= */
+
+class Member {
+
+    int memberId;
+    String memberName;
+    String memberType;
+
+    int borrowedCount;
+
+    static final int MAX_LIMIT = 3;
+
+    public Member(int memberId,
+                  String memberName,
+                  String memberType) {
+
+        this.memberId = memberId;
+        this.memberName = memberName;
+        this.memberType = memberType;
+
+        borrowedCount = 0;
+    }
+
+    public void displayMember() {
+
+        System.out.println("\nMember ID : " + memberId);
+        System.out.println("Name      : " + memberName);
+        System.out.println("Type      : " + memberType);
+        System.out.println("Borrowed Books : " + borrowedCount);
+    }
+}
+
+/* =========================
+   LOAN RECORD CLASS
+========================= */
+
+class LoanRecord {
+
+    Book book;
+    Member member;
+
+    int borrowDay;
+
+    static double totalFine = 0;
+
+    public LoanRecord(Book book,
+                      Member member,
+                      int borrowDay) {
+
+        this.book = book;
+        this.member = member;
+        this.borrowDay = borrowDay;
+    }
+
+    public void borrowBook()
+            throws BookNotAvailableException,
+            BorrowLimitExceededException {
+
+        if (!book.isAvailable()) {
+
+            throw new BookNotAvailableException(
+                    "Book is not available"
+            );
+        }
+
+        if (member.borrowedCount >= Member.MAX_LIMIT) {
+
+            throw new BorrowLimitExceededException(
+                    "Borrow limit exceeded"
+            );
+        }
+
+        book.setAvailable(false);
+
+        member.borrowedCount++;
+
+        System.out.println("\nBook Borrowed Successfully");
+    }
+
+    public void returnBook(int returnDay)
+            throws OverdueReturnException {
+
+        int totalDays = returnDay - borrowDay;
+
+        book.setAvailable(true);
+
+        member.borrowedCount--;
+
+        if (totalDays > 7) {
+
+            int lateDays = totalDays - 7;
+
+            double fine = lateDays * 10;
+
+            totalFine += fine;
+
+            throw new OverdueReturnException(
+                    "Late Return!\nFine = Rs." + fine
+            );
+        }
+
+        else {
+            System.out.println("\nBook Returned Successfully");
+        }
+    }
+}
+
+/* =========================
+   MAIN CLASS
+========================= */
+
+public class LibraryManagementSystem {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        /* =========================
+           MEMBER INPUT
+        ========================= */
+
+        System.out.println("Enter Member ID:");
+        int memberId = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Enter Member Name:");
+        String memberName = sc.nextLine();
+
+        System.out.println("Enter Member Type:");
+        String memberType = sc.nextLine();
+
+        Member member = new Member(
+                memberId,
+                memberName,
+                memberType
+        );
+
+        /* =========================
+           BOOK INPUT
+        ========================= */
+
+        System.out.println("\nEnter Book ID:");
+        int bookId = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Enter Book Title:");
+        String title = sc.nextLine();
+
+        System.out.println("Enter Author:");
+        String author = sc.nextLine();
+
+        System.out.println(
+                "Choose Book Type:\n1.Reference\n2.TextBook\n3.Journal"
+        );
+
+        int choice = sc.nextInt();
+
+        Book book = null;
+
+        if (choice == 1) {
+            book = new ReferenceBook(bookId, title, author);
+        }
+
+        else if (choice == 2) {
+            book = new TextBook(bookId, title, author);
+        }
+
+        else if (choice == 3) {
+            book = new Journal(bookId, title, author);
+        }
+
+        book.displayBook();
+
+        /* =========================
+           BORROWING
+        ========================= */
+
+        try {
+
+            System.out.println("\nEnter Borrow Day:");
+            int borrowDay = sc.nextInt();
+
+            LoanRecord loan = new LoanRecord(
+                    book,
+                    member,
+                    borrowDay
+            );
+
+            loan.borrowBook();
+
+            /* =========================
+               RETURNING
+            ========================= */
+
+            System.out.println("\nEnter Return Day:");
+            int returnDay = sc.nextInt();
+
+            loan.returnBook(returnDay);
+        }
+
+        catch (BookNotAvailableException e) {
+
+            System.out.println(
+                    "\nException : " + e.getMessage()
+            );
+        }
+
+        catch (BorrowLimitExceededException e) {
+
+            System.out.println(
+                    "\nException : " + e.getMessage()
+            );
+        }
+
+        catch (OverdueReturnException e) {
+
+            System.out.println(
+                    "\nException : " + e.getMessage()
+            );
+        }
+
+        catch (Exception e) {
+
+            System.out.println(
+                    "\nInvalid Input"
+            );
+        }
+
+        /* =========================
+           DISPLAY MEMBER
+        ========================= */
+
+        member.displayMember();
+
+        /* =========================
+           DISPLAY FINE
+        ========================= */
+
+        System.out.println(
+                "\nTotal Fine Collected = Rs."
+                        + LoanRecord.totalFine
+        );
+
+        sc.close();
+    }
+}
